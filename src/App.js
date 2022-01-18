@@ -1,16 +1,15 @@
 import './App.css';
-import Navbar from './pages/components/Navbar/Navbar';
+import { Routes, Route } from 'react-router-dom';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Main from './pages/main/Main';
 
 function App() {
 	return (
 		<div id="content" className="container">
-			<BrowserRouter history={history}>
-				<Switch>
-					<Route path="/login">
-						<Login />
-					</Route>
-				</Switch>
-			</BrowserRouter>
+			<Routes>
+				<Route path="/" element={<Dashboard />}></Route>
+				<Route path="/main" element={<Main />}></Route>
+			</Routes>
 		</div>
 	);
 }
