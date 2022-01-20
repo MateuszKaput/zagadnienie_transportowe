@@ -1,0 +1,24 @@
+.nad_odb {
+	display: flex;
+	gap: 1rem;
+}
+
+.nad_odb table {
+	flex-grow: 1;
+	text-align: center;
+}
+td {
+	border-width: 1px;
+	border-style: solid;
+	width: 100px;
+	height: fit-content;
+	text-align: center;
+}
+
+.div_ceny {
+	margin-top: 20px;
+	justify-content: center;
+}
+.first_col {
+	float: left;
+}

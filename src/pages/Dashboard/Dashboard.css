@@ -1,0 +1,10 @@
+.container {
+	align-items: center;
+	justify-content: center;
+	text-align: left;
+	background-color: lightgray;
+	padding: 0 3vh;
+}
+ol {
+	text-align: left;
+}

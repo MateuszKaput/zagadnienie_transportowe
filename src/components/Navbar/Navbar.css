@@ -1,113 +1,92 @@
 .header {
-	font-family: 'Poppins', sans-serif;
-	background-color: gray;
-	border-radius: 10px;
-}
-
-.slider ul {
-	width: 100%;
-	transition: 1s ease;
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	justify-content: flex-end;
 }
-
-.slider ul li {
-	margin-block: 0.5rem;
-	margin-inline: 2rem;
-	list-style: none;
-}
-
-.slider ul li Button,
-.link a {
-	font-size: 15px;
-	text-decoration: none;
-	color: #fff;
-	font-weight: bolder;
-}
-
-.menu-icon .menu {
-	display: none;
-	color: #fff;
-	font-size: 60px;
-}
-
-.closed {
-	display: none;
+.menu-icon {
+	margin-top: 1em;
 	cursor: pointer;
-	color: #fff;
-	justify-content: flex-start;
-	width: 100%;
 }
-.logout {
-	background-color: red;
-	padding: 10px 30px;
-	border-radius: 10px;
+.slider {
+	position: fixed;
+	gap: 1rem;
+	top: 0;
+	right: 0;
+	height: 100vh;
+	width: 50%;
+	background: black;
+	z-index: 999;
+	text-transform: uppercase;
+	transform: translateX(100%);
+	transition: transform 0.5s ease-in-out;
 }
+.slider ul {
+	list-style-type: none;
+	padding: 0;
+	margin-top: 8em;
+}
+.slider ul li Button {
+	margin: 1em;
+	color: white;
+	padding: 0.75em 2em;
+}
+.slider li {
+	flex-grow: 1;
+}
+.slider ul li Button:hover {
+	background: gray;
+}
+.close {
+	float: right;
+	margin: 1em;
+	width: 2.5em;
+	color: white;
+	cursor: pointer;
+}
+
 .MuiMenuItem-root {
 	font-family: 'Poppins', sans-serif;
-	background-color: rgb(156, 155, 155);
+	background-color: rgb(187, 186, 186);
 	font-size: 15px;
-	color: #fff;
+	color: black;
 	font-weight: bolder;
 	padding: 10px 30px;
 	text-transform: uppercase;
 }
 .MuiList-root {
-	background-color: rgb(156, 155, 155);
+	background-color: rgb(187, 186, 186);
 }
 .menu-link {
 	text-decoration: none;
 }
-
-@media (max-width: 1000px) {
+.open-slider {
+	transform: translateX(0);
+}
+@media only screen and (min-width: 920px) {
 	.header {
-		font-family: 'Poppins', sans-serif;
-		background-color: gray;
+		justify-content: center;
 	}
-
+	.menu-icon {
+		display: none;
+	}
 	.slider {
-		position: fixed;
-		min-width: 100%;
-		height: 100vh;
-		top: -100%;
-		background-color: rgb(17, 12, 12);
-	}
-
-	.slider.active {
-		position: relative;
-		top: 0;
-	}
-
-	.slider ul {
-		display: relative;
-		flex-direction: column;
-		align-items: center;
-		list-style: none;
-	}
-
-	.slider ul li {
-		margin-block: 2.5rem;
-	}
-
-	.slider ul li Button {
-		font-size: 25px;
-		text-decoration: none;
-		color: #fff;
-	}
-
-	.menu-icon .menu {
+		transform: translateX(0);
+		position: unset;
 		display: block;
-		color: #fff;
-		font-size: 60px;
-		justify-content: right;
+		width: auto;
+		height: auto;
+		background: none;
 	}
-
-	.closed {
+	.close {
+		display: none;
+	}
+	.slider ul {
 		display: flex;
-		cursor: pointer;
-		color: #fff;
-		justify-content: flex-start;
-		width: 100%;
+		margin: 0;
+	}
+	.slider ul li Button {
+		color: black;
+		padding: 0.75em 2em;
+		background-color: rgb(187, 186, 186);
+		margin: 10px;
 	}
 }

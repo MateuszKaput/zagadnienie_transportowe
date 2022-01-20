@@ -1,99 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Button } from '@mui/material';
 import { Close, MenuOutlined } from '@mui/icons-material';
 
-const Navbar = ({ setActiveMenu }) => {
-	const [anchorEl, setAnchorEl] = React.useState(null);
-	const open = Boolean(anchorEl);
-
-	const [active, setActive] = useState(false);
-
+const Navbar = () => {
 	const showMenu = () => {
-		setActive(true);
-		setActiveMenu(true);
+		document.querySelector('.slider').classList.add('open-slider');
 	};
 
 	const closeMenu = () => {
-		setActive(false);
-		setActiveMenu(false);
+		document.querySelector('.slider').classList.remove('open-slider');
 	};
-
-	const handleClick = (event) => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleOnClose = () => {
-		setAnchorEl(null);
-		closeMenu();
-	};
-
 	return (
 		<div className="header">
 			<div className="menu-icon">
 				<MenuOutlined className="menu" onClick={showMenu} />
 			</div>
-			<nav className={active ? 'slider active' : 'slider'}>
+			<nav className={'slider'}>
+				<Close className="close" onClick={closeMenu} />
 				<ul>
-					<div className="closed">
-						<Close className="close" onClick={closeMenu} />
-					</div>
 					<li>
-						<Button
-							id="dashboard-button"
-							aria-controls="dashboard-menu"
-							aria-haspopup="true"
-							aria-expanded={open ? 'true' : undefined}
-							onClick={handleClick}
-						>
-							Strona główna
-						</Button>
-						<Menu id="dashboard-menu" anchorEl={anchorEl} open={anchorEl?.id === 'dashboard-button'} onClose={handleOnClose}>
-							<Link className="menu-link" to="/">
-								<MenuItem onClick={handleOnClose}>Dashboard</MenuItem>
-							</Link>
-						</Menu>
+						<Link className="menu-link" to="/">
+							<Button id="dashboard-button">Strona główna</Button>
+						</Link>
 					</li>
 					<li>
-						<Button
-							id="example-button"
-							aria-controls="example-menu"
-							aria-haspopup="true"
-							aria-expanded={open ? 'true' : undefined}
-							onClick={handleClick}
-						>
-							Przykład
-						</Button>
-						<Menu id="example-menu" anchorEl={anchorEl} open={anchorEl?.id === 'example-button'} onClose={handleOnClose}>
-							<Link className="menu-link" to="/example">
-								<MenuItem onClick={handleOnClose}>Rozwiązany przykład</MenuItem>
-							</Link>
-						</Menu>
-					</li>
-					<li>
-						<Button
-							id="user-button"
-							aria-controls="user-menu"
-							aria-haspopup="true"
-							aria-expanded={open ? 'true' : undefined}
-							onClick={handleClick}
-						>
-							Użytkownicy
-						</Button>
-						<Menu id="user-menu" anchorEl={anchorEl} open={anchorEl?.id === 'user-button' ? true : false} onClose={handleOnClose}>
-							<Link to="/users">
-								<MenuItem onClick={handleOnClose}></MenuItem>
-							</Link>
-							<Link to="/UserAdd">
-								<MenuItem onClick={handleOnClose}></MenuItem>
-							</Link>
-							<MenuItem
-								onKeyDown={(event) => {
-									event.stopPropagation();
-								}}
-							></MenuItem>
-						</Menu>
+						<Link className="menu-link" to="/example">
+							<Button id="example-button">Przykład</Button>
+						</Link>
 					</li>
 				</ul>
 			</nav>
