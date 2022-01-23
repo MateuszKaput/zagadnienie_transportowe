@@ -1,11 +1,25 @@
-.nad_odb {
-	display: flex;
-	gap: 1rem;
+.box h2 {
+	text-align: center;
 }
 
-.nad_odb table {
+.firstPart {
+	display: flex;
+	gap: 1rem;
+	padding: 1rem;
+}
+
+.firstPart div {
 	flex-grow: 1;
 	text-align: center;
+}
+.odbiorcy,
+.nadawcy {
+	margin: 0 auto;
+}
+
+.secondPart {
+	text-align: center;
+	padding: 1rem;
 }
 td {
 	border-width: 1px;
@@ -16,8 +30,11 @@ td {
 }
 
 .div_ceny {
+	display: flex;
 	margin-top: 20px;
 	justify-content: center;
+	justify-items: center;
+	align-items: center;
 }
 .first_col {
 	float: left;

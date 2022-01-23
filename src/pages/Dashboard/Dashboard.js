@@ -1,27 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '../../components/Navbar/Navbar';
 import './Dashboard.css';
-import img1 from '../../images/img1.JPG';
-import Table from '../../components/Table/Table';
 
 const Dashboard = () => {
-	const [dane, changeValue] = useState({
-		rows: 3,
-		columns: 4,
-		required: [60, 80, 100],
-		offered: [40, 60, 80, 60],
-		prices: [
-			[1, 2, 3, 4],
-			[4, 3, 2, 0],
-			[0, 2, 2, 1],
-		],
-	});
-
 	return (
 		<div className="container">
 			<Navbar />
 			<h1>Zagadnienie transportowe</h1>
-			<div>
+			<div className="content">
 				<p>
 					Załóżmy, że chcemy przesłać towary z "m" punktów do "n" odbiorców.
 					<br />
@@ -46,7 +32,6 @@ const Dashboard = () => {
 				<ol>
 					<li>Budowa tablicy wielkości przewozów (metodą kąta północno-zachodniego):</li>
 				</ol>
-				<Table dane={dane} />
 			</div>
 		</div>
 	);
