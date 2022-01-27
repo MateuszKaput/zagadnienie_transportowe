@@ -30,6 +30,11 @@ const Navbar = () => {
 							<Button id="example-button">Przykład</Button>
 						</Link>
 					</li>
+					<li>
+						<Link className="menu-link" to="/userExample">
+							<Button id="userExample-button">Rozwiąż to sam</Button>
+						</Link>
+					</li>
 				</ul>
 			</nav>
 		</div>

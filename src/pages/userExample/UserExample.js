@@ -2,12 +2,14 @@ import React, { useRef, useState } from 'react';
 import { useDidMount } from 'rooks';
 import Navbar from '../../components/Navbar/Navbar';
 import Table from '../../components/Table/Table';
-import './Example.css';
+import './UserExample.css';
 import useDidMountEffect from '../../hooks/useDidMountEffect';
 import SolutionTable from 'components/Table/SolutionTable';
+import { Button, FormControl, Input, TextField } from '@mui/material';
+import { useForm } from 'hooks/useForm';
 
-function Example() {
-	const [basicData] = useState({
+function UserExample() {
+	const [basicData, setBasic] = useState({
 		rows: 3,
 		columns: 4,
 		required: [60, 80, 100],
@@ -17,16 +19,32 @@ function Example() {
 			[4, 3, 2, 0],
 			[0, 2, 2, 1],
 		],
-		// rows: 3,
-		// columns: 3,
-		// required: [50, 70, 30],
-		// offered: [20, 40, 90],
-		// prices: [
-		// 	[3, 5, 7],
-		// 	[12, 10, 9],
-		// 	[13, 3, 9],
-		// ],
 	});
+
+	const [dostawcy, , setDostawcy] = useForm({
+		dostawcy: 2,
+	});
+	const [dostawcyState, setDostawcyState] = useState({
+		jeden: 1,
+		dwa: 2,
+	});
+
+	const [odbiorcy, , setOdbiorcy] = useForm({
+		odbiorcy: 2,
+	});
+	const [odbiorcyState, setOdbiorcyState] = useState({
+		jeden: 1,
+		dwa: 2,
+	});
+
+	const [wymagane, , setWymagane] = useForm();
+	const [wymaganeState, setWymaganeState] = useState({});
+
+	const [oferowane, , setOferowane] = useForm();
+	const [oferowaneState, setOferowaneState] = useState({});
+
+	const [ceny, , setCeny] = useForm();
+	const [cenyState, setCenyState] = useState({});
 
 	const [counter, setCounter] = useState(0);
 	const [solutionsTable, updateSolutionsTable] = useState([]);
@@ -34,6 +52,39 @@ function Example() {
 	const [determinantTable, updateDeterminantTable] = useState([]);
 	const [maxCellTable, updateMaxCellTable] = useState([]);
 	const keepSolvingRef = useRef(true);
+
+	useDidMountEffect(() => {
+		console.log('Nowi temp dostawcy!', dostawcyState);
+	}, [dostawcyState]);
+
+	useDidMountEffect(() => {
+		console.log('Nowi odbiorcy!', odbiorcyState);
+		let obj = {};
+		for (let i = 0; i < Object.keys(odbiorcyState).length; i++) {
+			obj[i] = 0;
+		}
+		console.log(obj);
+		setWymaganeState(obj);
+	}, [odbiorcyState]);
+
+	useDidMountEffect(() => {
+		console.log('Nowe ceny!!', cenyState);
+		let obj = {
+			rows: 2,
+			columns: 2,
+			required: [],
+			offered: [],
+			prices: [],
+		};
+	}, [cenyState]);
+
+	useDidMountEffect(() => {
+		console.log('Nowe oferowane!', oferowaneState);
+	}, [oferowaneState]);
+
+	useDidMountEffect(() => {
+		console.log('Nowe wymagane!', wymaganeState);
+	}, [wymaganeState]);
 
 	useDidMountEffect(() => {
 		console.log('Update pathTable', pathTable);
@@ -64,7 +115,7 @@ function Example() {
 			console.log('Bingo rozwiązane! ');
 			console.log(solutionsTable);
 		} else {
-			if (counter > 10) {
+			if (counter > 8) {
 				console.log('Brak optymalnego rozwiązania :C');
 			} else {
 				console.log('--------------------------------------------------------------------------------------------------------');
@@ -344,10 +395,192 @@ function Example() {
 		solveFirstTime(tempTable, basicData);
 	};
 	useDidMount(() => createEmptyArray(basicData));
+
+	const dostawcyLenght = () => {
+		let obj = {};
+		for (let i = 0; i < dostawcy.dostawcy; i++) {
+			obj[i] = 0;
+		}
+		setDostawcyState(obj);
+	};
+	const odbiorcyLenght = () => {
+		let obj = {};
+		for (let i = 0; i < odbiorcy.odbiorcy; i++) {
+			obj[i] = 0;
+		}
+		setOdbiorcyState(obj);
+	};
 	return (
 		<div className="container">
 			<Navbar />
 			<div className="box">
+				<div className="flexRows">
+					<div className="singleRow">
+						<div>
+							<FormControl className="flexForm">
+								<TextField
+									type="number"
+									inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }}
+									required
+									fullWidth
+									margin="normal"
+									label={'Liczba dostawców'}
+									variant="outlined"
+									onChange={setDostawcy('dostawcy')}
+								/>
+								<Button variant="contained" onClick={() => dostawcyLenght()}>
+									{'Potwierdź'}
+								</Button>
+							</FormControl>
+						</div>
+						<div>
+							<FormControl className="flexForm">
+								<TextField
+									type="number"
+									inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }}
+									required
+									fullWidth
+									margin="normal"
+									label={'Liczba odbiorców'}
+									variant="outlined"
+									onChange={setOdbiorcy('odbiorcy')}
+								/>
+								<Button variant="contained" onClick={() => odbiorcyLenght()}>
+									{'Potwierdź'}
+								</Button>
+							</FormControl>
+						</div>
+					</div>
+					<div className="singleRow">
+						<FormControl className="flexForm">
+							<table>
+								<thead>
+									<tr>
+										{Object.keys(dostawcyState).map((element, index) => (
+											<td key={index}>Dostawca {index}</td>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										{Object.keys(dostawcyState).map((element, index) => (
+											<td key={index}>
+												<TextField
+													type="number"
+													inputProps={{
+														style: { textAlign: 'center' },
+														inputMode: 'numeric',
+														pattern: '[0-9]*',
+													}}
+													placeholder={'Ilośc towaru'}
+													onChange={setOferowane('numer' + index)}
+												/>
+											</td>
+										))}
+									</tr>
+								</tbody>
+							</table>
+							<Button variant="contained" onClick={() => setOferowaneState(oferowane)}>
+								{'Potwierdź'}
+							</Button>
+						</FormControl>
+					</div>
+					<div className="singleRow">
+						<FormControl className="flexForm">
+							<table>
+								<thead>
+									<tr>
+										{Object.keys(odbiorcyState).map((element, index) => (
+											<td key={index}>Odbiorca {index}</td>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										{Object.keys(odbiorcyState).map((element, index) => (
+											<td key={index}>
+												<TextField
+													type="number"
+													inputProps={{
+														style: { textAlign: 'center' },
+														inputMode: 'numeric',
+														pattern: '[0-9]*',
+													}}
+													placeholder={'Ilośc towaru'}
+													onChange={setWymagane('numer' + index)}
+												/>
+											</td>
+										))}
+									</tr>
+								</tbody>
+							</table>
+							<Button variant="contained" onClick={() => setWymaganeState(wymagane)}>
+								{'Potwierdź'}
+							</Button>
+						</FormControl>
+					</div>
+					<div className="singleRow">
+						<FormControl className="flexForm">
+							<div className="divCeny">
+								<table className="firstCol">
+									<thead>
+										<tr>
+											<td>Ceny</td>
+										</tr>
+										{Object.keys(dostawcyState).map((element, index) => (
+											<tr key={index}>
+												<td key={index}>
+													<TextField
+														inputProps={{ style: { textAlign: 'center' } }}
+														variant="standard"
+														size="small"
+														value={'Dostawca ' + index}
+													/>
+												</td>
+											</tr>
+										))}
+									</thead>
+								</table>
+								<table className="rows">
+									<thead>
+										<tr>
+											{Object.keys(odbiorcyState).map((element, index) => (
+												<td key={index}>Odbiorca {index}</td>
+											))}
+										</tr>
+									</thead>
+									<tbody>
+										{Object.keys(dostawcyState).map((element, index) => (
+											<tr key={index}>
+												{Object.keys(odbiorcyState).map((element, index1) => (
+													<td key={index1}>
+														<TextField
+															type="number"
+															variant="standard"
+															size="small"
+															inputProps={{
+																style: {
+																	textAlign: 'center',
+																},
+																inputMode: 'numeric',
+																pattern: '[0-9]*',
+															}}
+															placeholder={'Cena przewozu'}
+															onChange={setCeny('numer' + index + index1)}
+														/>
+													</td>
+												))}
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+							<Button variant="contained" onClick={() => setCenyState(ceny)}>
+								{'Potwierdź'}
+							</Button>
+						</FormControl>
+					</div>
+				</div>
 				<h2>Dane wejściowe</h2>
 				<Table dane={basicData} />
 				<SolutionTable solutionsTable={solutionsTable} pathTable={pathTable} determinantTable={determinantTable} maxCellTable={maxCellTable} />
@@ -356,4 +589,4 @@ function Example() {
 	);
 }
 
-export default Example;
+export default UserExample;

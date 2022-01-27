@@ -1,7 +1,7 @@
 import React from 'react';
 import './Table.css';
 
-function Table({ dane: { rows, columns, required, offered, prices } }) {
+function Table({ dane: { required, offered, prices } }) {
 	return (
 		<>
 			<div className="firstPart">

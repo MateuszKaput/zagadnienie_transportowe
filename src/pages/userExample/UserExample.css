@@ -1,0 +1,35 @@
+.singleRow {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	text-align: center;
+}
+
+.singleRow div {
+	flex-grow: 1;
+	text-align: center;
+}
+.singleRow table tr td {
+	width: 150px;
+}
+.flexRows {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.flexForm {
+	flex-grow: 0 !important;
+}
+
+.divCeny {
+	display: flex;
+	justify-content: center;
+	justify-items: center;
+	align-items: center;
+	flex-shrink: 1;
+	flex-grow: 1;
+}
+.firstRow {
+	flex-grow: 1;
+}

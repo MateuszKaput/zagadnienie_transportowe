@@ -1,0 +1,39 @@
+.divFlexBox {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+.divSingleRow {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+	flex-shrink: 1;
+	justify-content: center;
+	text-align: center;
+}
+.divSingleRow p {
+	flex-shrink: 1;
+}
+.insideRow {
+	width: 800px;
+	flex-grow: 1;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	flex-basis: 0;
+	flex-wrap: nowrap;
+}
+.tableDiv {
+	flex-wrap: nowrap;
+	display: flex;
+	justify-content: center;
+}
+
+.oneElement {
+	flex-grow: 1;
+	justify-content: center;
+	text-align: center;
+	align-items: center;
+	margin: 0 auto;
+	flex-basis: 0;
+}

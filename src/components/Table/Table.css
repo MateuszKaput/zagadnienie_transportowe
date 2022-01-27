@@ -6,6 +6,8 @@
 	display: flex;
 	gap: 1rem;
 	padding: 1rem;
+	flex-shrink: 0;
+	flex-wrap: wrap;
 }
 
 .firstPart div {
@@ -20,11 +22,13 @@
 .secondPart {
 	text-align: center;
 	padding: 1rem;
+	flex-wrap: wrap;
+	flex-shrink: 0;
 }
 td {
 	border-width: 1px;
 	border-style: solid;
-	width: 100px;
+	width: 90px;
 	height: fit-content;
 	text-align: center;
 }
@@ -35,7 +39,13 @@ td {
 	justify-content: center;
 	justify-items: center;
 	align-items: center;
+	flex-shrink: 0;
 }
 .first_col {
 	float: left;
+	flex-shrink: 0;
+}
+
+.rows {
+	flex-shrink: 0;
 }
