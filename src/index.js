@@ -8,14 +8,12 @@ import { ThemeProvider, StyledEngineProvider, createTheme } from '@mui/material'
 const theme = createTheme();
 
 ReactDOM.render(
-	<React.StrictMode>
-		<StyledEngineProvider injectFirst>
-			<ThemeProvider theme={theme}>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</ThemeProvider>
-		</StyledEngineProvider>
-	</React.StrictMode>,
+	<StyledEngineProvider injectFirst>
+		<ThemeProvider theme={theme}>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		</ThemeProvider>
+	</StyledEngineProvider>,
 	document.getElementById('root')
 );

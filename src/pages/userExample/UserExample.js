@@ -54,7 +54,7 @@ function UserExample() {
 	const keepSolvingRef = useRef(true);
 
 	useDidMountEffect(() => {
-		console.log('Nowi temp dostawcy!', dostawcyState);
+		console.log('Nowi temp dostawcy !', dostawcyState);
 	}, [dostawcyState]);
 
 	useDidMountEffect(() => {
@@ -63,7 +63,6 @@ function UserExample() {
 		for (let i = 0; i < Object.keys(odbiorcyState).length; i++) {
 			obj[i] = 0;
 		}
-		console.log(obj);
 		setWymaganeState(obj);
 	}, [odbiorcyState]);
 
@@ -394,7 +393,6 @@ function UserExample() {
 		}
 		solveFirstTime(tempTable, basicData);
 	};
-	useDidMount(() => createEmptyArray(basicData));
 
 	const dostawcyLenght = () => {
 		let obj = {};
@@ -410,12 +408,58 @@ function UserExample() {
 		}
 		setOdbiorcyState(obj);
 	};
+
+	useDidMountEffect(() => {
+		console.log('basic', basicData);
+		// console.log('odb/nad', odbiorcyState, dostawcyState);
+		// console.log('towary', wymaganeState, oferowaneState);
+		// console.log('ceny', cenyState);
+		convertData();
+	}, [cenyState]);
+
+	useDidMountEffect(() => {
+		console.log('basic 2', basicData);
+		createEmptyArray(basicData);
+	}, [basicData]);
+
+	const totalneZatwierdzenie = () => {
+		setCenyState(ceny);
+	};
+
+	const convertData = () => {
+		let rows = Object.keys(odbiorcyState).length;
+		let columns = Object.keys(dostawcyState).length;
+		let required = [];
+		let offered = [];
+		let prices = [];
+		let rawPrices = [];
+
+		Object.values(wymaganeState).map((data, index) => {
+			required[index] = parseInt(data);
+		});
+		Object.values(oferowaneState).map((data, index) => {
+			offered[index] = parseInt(data);
+		});
+		Object.values(cenyState).map((value, index) => {
+			rawPrices[index] = value;
+		});
+		for (let i = 0; i < rows; i++) {
+			prices[i] = [];
+		}
+		Object.keys(cenyState).map((value, index) => {
+			let x = parseInt(value.substr(5, 1));
+			let y = parseInt(value.substr(6, 1));
+			prices[x][y] = parseInt(cenyState[value]);
+		});
+		setBasic({ rows: rows, columns: columns, required: required, offered: offered, prices: prices });
+	};
 	return (
 		<div className="container">
 			<Navbar />
 			<div className="box">
 				<div className="flexRows">
 					<div className="singleRow">
+						{/* Dostawcy/odbiorcy */}
 						<div>
 							<FormControl className="flexForm">
 								<TextField
@@ -429,7 +473,7 @@ function UserExample() {
 									onChange={setDostawcy('dostawcy')}
 								/>
 								<Button variant="contained" onClick={() => dostawcyLenght()}>
-									{'Potwierdź'}
+									{'Zatwiedź dostawców'}
 								</Button>
 							</FormControl>
 						</div>
@@ -446,7 +490,7 @@ function UserExample() {
 									onChange={setOdbiorcy('odbiorcy')}
 								/>
 								<Button variant="contained" onClick={() => odbiorcyLenght()}>
-									{'Potwierdź'}
+									{'Zatwiedź  odbiorców'}
 								</Button>
 							</FormControl>
 						</div>
@@ -457,7 +501,7 @@ function UserExample() {
 								<thead>
 									<tr>
 										{Object.keys(dostawcyState).map((element, index) => (
-											<td key={index}>Dostawca {index}</td>
+											<td key={index}>Dostawca {index + 1}</td>
 										))}
 									</tr>
 								</thead>
@@ -481,7 +525,7 @@ function UserExample() {
 								</tbody>
 							</table>
 							<Button variant="contained" onClick={() => setOferowaneState(oferowane)}>
-								{'Potwierdź'}
+								{'Dodaj dostępny towar'}
 							</Button>
 						</FormControl>
 					</div>
@@ -491,7 +535,7 @@ function UserExample() {
 								<thead>
 									<tr>
 										{Object.keys(odbiorcyState).map((element, index) => (
-											<td key={index}>Odbiorca {index}</td>
+											<td key={index}>Odbiorca {index + 1}</td>
 										))}
 									</tr>
 								</thead>
@@ -515,7 +559,7 @@ function UserExample() {
 								</tbody>
 							</table>
 							<Button variant="contained" onClick={() => setWymaganeState(wymagane)}>
-								{'Potwierdź'}
+								{'Dodaj wymagany towar'}
 							</Button>
 						</FormControl>
 					</div>
@@ -527,14 +571,14 @@ function UserExample() {
 										<tr>
 											<td>Ceny</td>
 										</tr>
-										{Object.keys(dostawcyState).map((element, index) => (
+										{Object.keys(odbiorcyState).map((element, index) => (
 											<tr key={index}>
 												<td key={index}>
 													<TextField
 														inputProps={{ style: { textAlign: 'center' } }}
 														variant="standard"
 														size="small"
-														value={'Dostawca ' + index}
+														value={'Odbiorca ' + ++index}
 													/>
 												</td>
 											</tr>
@@ -544,15 +588,15 @@ function UserExample() {
 								<table className="rows">
 									<thead>
 										<tr>
-											{Object.keys(odbiorcyState).map((element, index) => (
-												<td key={index}>Odbiorca {index}</td>
+											{Object.keys(dostawcyState).map((element, index) => (
+												<td key={index}>Dostawca {index + 1}</td>
 											))}
 										</tr>
 									</thead>
 									<tbody>
-										{Object.keys(dostawcyState).map((element, index) => (
+										{Object.keys(odbiorcyState).map((element, index) => (
 											<tr key={index}>
-												{Object.keys(odbiorcyState).map((element, index1) => (
+												{Object.keys(dostawcyState).map((element, index1) => (
 													<td key={index1}>
 														<TextField
 															type="number"
@@ -575,12 +619,13 @@ function UserExample() {
 									</tbody>
 								</table>
 							</div>
-							<Button variant="contained" onClick={() => setCenyState(ceny)}>
-								{'Potwierdź'}
+							<Button variant="contained" onClick={totalneZatwierdzenie}>
+								{'Zatwierdź koszty transportu i obliccz'}
 							</Button>
 						</FormControl>
 					</div>
 				</div>
+				<hr />
 				<h2>Dane wejściowe</h2>
 				<Table dane={basicData} />
 				<SolutionTable solutionsTable={solutionsTable} pathTable={pathTable} determinantTable={determinantTable} maxCellTable={maxCellTable} />
