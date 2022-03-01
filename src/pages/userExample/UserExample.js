@@ -7,6 +7,7 @@ import useDidMountEffect from '../../hooks/useDidMountEffect';
 import SolutionTable from 'components/Table/SolutionTable';
 import { Button, FormControl, Input, TextField } from '@mui/material';
 import { useForm } from 'hooks/useForm';
+import Swal from 'sweetalert2';
 
 function UserExample() {
 	const [basicData, setBasic] = useState({
@@ -38,13 +39,13 @@ function UserExample() {
 	});
 
 	const [wymagane, , setWymagane] = useForm();
-	const [wymaganeState, setWymaganeState] = useState({});
+	const [wymaganeState, setWymaganeState] = useState();
 
 	const [oferowane, , setOferowane] = useForm();
-	const [oferowaneState, setOferowaneState] = useState({});
+	const [oferowaneState, setOferowaneState] = useState();
 
 	const [ceny, , setCeny] = useForm();
-	const [cenyState, setCenyState] = useState({});
+	const [cenyState, setCenyState] = useState();
 
 	const [counter, setCounter] = useState(0);
 	const [solutionsTable, updateSolutionsTable] = useState([]);
@@ -52,54 +53,6 @@ function UserExample() {
 	const [determinantTable, updateDeterminantTable] = useState([]);
 	const [maxCellTable, updateMaxCellTable] = useState([]);
 	const keepSolvingRef = useRef(true);
-
-	useDidMountEffect(() => {
-		console.log('Nowi temp dostawcy !', dostawcyState);
-	}, [dostawcyState]);
-
-	useDidMountEffect(() => {
-		console.log('Nowi odbiorcy!', odbiorcyState);
-		let obj = {};
-		for (let i = 0; i < Object.keys(odbiorcyState).length; i++) {
-			obj[i] = 0;
-		}
-		setWymaganeState(obj);
-	}, [odbiorcyState]);
-
-	useDidMountEffect(() => {
-		console.log('Nowe ceny!!', cenyState);
-		let obj = {
-			rows: 2,
-			columns: 2,
-			required: [],
-			offered: [],
-			prices: [],
-		};
-	}, [cenyState]);
-
-	useDidMountEffect(() => {
-		console.log('Nowe oferowane!', oferowaneState);
-	}, [oferowaneState]);
-
-	useDidMountEffect(() => {
-		console.log('Nowe wymagane!', wymaganeState);
-	}, [wymaganeState]);
-
-	useDidMountEffect(() => {
-		console.log('Update pathTable', pathTable);
-	}, [pathTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update solutionsTable', solutionsTable);
-	}, [solutionsTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update determinantTable', determinantTable);
-	}, [determinantTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update maxCellTable', maxCellTable);
-	}, [maxCellTable]);
 
 	useDidMountEffect(() => {
 		let isSolved = true;
@@ -111,14 +64,16 @@ function UserExample() {
 			}
 		});
 		if (isSolved) {
-			console.log('Bingo rozwiązane! ');
-			console.log(solutionsTable);
 		} else {
+			if (solutionsTable.length > 2) {
+				Object.values(solutionsTable).map((value, index) => {
+					console.log(value);
+				});
+				console.log('--------------------------');
+			}
+
 			if (counter > 8) {
-				console.log('Brak optymalnego rozwiązania :C');
 			} else {
-				console.log('--------------------------------------------------------------------------------------------------------');
-				console.log('Rozpoczynam ponowną procedurę wyszukania z punktem nośnym: ', maxCellTable[maxCellTable.length - 1][1]);
 				setCounter(counter + 1);
 				keepSolvingRef.current = true;
 				findNewPath(maxCellTable[maxCellTable.length - 1][1], '', newPathTable, iteration);
@@ -410,23 +365,20 @@ function UserExample() {
 	};
 
 	useDidMountEffect(() => {
-		console.log('basic', basicData);
-		// console.log('odb/nad', odbiorcyState, dostawcyState);
-		// console.log('towary', wymaganeState, oferowaneState);
-		// console.log('ceny', cenyState);
-		convertData();
+		wymaganeState === undefined ? errorPopup() : oferowaneState === undefined ? errorPopup() : cenyState === undefined ? errorPopup() : checkRepeat();
 	}, [cenyState]);
+
+	function checkRepeat() {
+		convertData();
+	}
 
 	useDidMountEffect(() => {
 		console.log('basic 2', basicData);
 		createEmptyArray(basicData);
 	}, [basicData]);
 
-	const totalneZatwierdzenie = () => {
-		setCenyState(ceny);
-	};
-
 	const convertData = () => {
+		confirmation();
 		let rows = Object.keys(odbiorcyState).length;
 		let columns = Object.keys(dostawcyState).length;
 		let required = [];
@@ -453,6 +405,24 @@ function UserExample() {
 		});
 		setBasic({ rows: rows, columns: columns, required: required, offered: offered, prices: prices });
 	};
+
+	function errorPopup() {
+		Swal.fire({
+			icon: 'error',
+			title: 'Nie wprowadzono wszystkich danych',
+			showConfirmButton: false,
+			timer: 1000,
+		});
+	}
+	function confirmation(dane) {
+		Swal.fire({
+			icon: 'success',
+			title: 'Rozpoczynam obliczanie optymalnego rozwiązania',
+			showConfirmButton: false,
+			timer: 2000,
+		});
+	}
+
 	return (
 		<div className="container">
 			<Navbar />
@@ -619,8 +589,8 @@ function UserExample() {
 									</tbody>
 								</table>
 							</div>
-							<Button variant="contained" onClick={totalneZatwierdzenie}>
-								{'Zatwierdź koszty transportu i obliccz'}
+							<Button variant="contained" onClick={() => setCenyState(ceny)}>
+								{'Zatwierdź koszty transportu i oblicz'}
 							</Button>
 						</FormControl>
 					</div>

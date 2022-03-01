@@ -24,9 +24,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											</tr>
 											{solutionsTable[index].map((value1, mango1) => (
 												<tr key={Math.random()}>
-													<td key={Math.random()}>
-														Odbiorca {mango1}
-													</td>
+													<td key={Math.random()}>Odbiorca {mango1 + 1}</td>
 												</tr>
 											))}
 										</thead>
@@ -35,9 +33,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 										<thead>
 											<tr>
 												{solutionsTable[index][0].map((value1, mango2) => (
-													<td key={Math.random()}>
-														Dostawca {mango2}
-													</td>
+													<td key={Math.random()}>Dostawca {mango2 + 1}</td>
 												))}
 											</tr>
 										</thead>
@@ -45,13 +41,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											{solutionsTable[index].map((value1, mango3) => (
 												<tr key={Math.random()}>
 													{value1.map((banana, mango4) => (
-														<td
-															key={Math.random()}
-														>
-															{
-																banana
-															}
-														</td>
+														<td key={Math.random()}>{banana}</td>
 													))}
 												</tr>
 											))}
@@ -109,10 +99,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											</tr>
 											{determinantTable[index].map((value1, mango9) => (
 												<tr key={Math.random()}>
-													<td key={Math.random()}>
-														Wskaźnik{' '}
-														{mango9 + 1}
-													</td>
+													<td key={Math.random()}>Wskaźnik {mango9 + 1}</td>
 												</tr>
 											))}
 										</thead>
@@ -129,12 +116,8 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											{determinantTable[index].map((value1, mango9) => (
 												<tr key={Math.random()}>
 													<td key={Math.random()}>{value1[0]}</td>
-													<td key={Math.random()}>
-														{value1[1][0]}
-													</td>
-													<td key={Math.random()}>
-														{value1[1][1]}
-													</td>
+													<td key={Math.random()}>{value1[1][0]}</td>
+													<td key={Math.random()}>{value1[1][1]}</td>
 												</tr>
 											))}
 										</tbody>
@@ -151,9 +134,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											</tr>
 											{pathTable[index].map((value1, mango9) => (
 												<tr key={Math.random()}>
-													<td key={Math.random()}>
-														Punkt {mango9 + 1}
-													</td>
+													<td key={Math.random()}>Punkt {mango9 + 1}</td>
 												</tr>
 											))}
 										</thead>
@@ -170,13 +151,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											{pathTable[index].map((value1, mango11) => (
 												<tr key={Math.random()}>
 													{value1.map((banana, mango12) => (
-														<td
-															key={Math.random()}
-														>
-															{
-																banana
-															}
-														</td>
+														<td key={Math.random()}>{banana}</td>
 													))}
 												</tr>
 											))}
