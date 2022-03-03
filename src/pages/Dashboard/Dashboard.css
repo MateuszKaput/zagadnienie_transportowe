@@ -3,12 +3,43 @@
 	justify-content: center;
 	text-align: left;
 	background-color: lightgray;
-	padding: 0 3vh;
+	padding: 0;
 }
-ol {
-	text-align: left;
+.content {
+	padding: 2rem 5rem 1rem 5rem;
 }
 
-.content {
+.singlepart {
+	display: flex;
+	gap: 1rem;
 	padding: 1rem;
+	flex-shrink: 0;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+}
+ul {
+	list-style: none;
+}
+b > li {
+	padding: 1rem;
+}
+li {
+	padding: 0.4rem;
+}
+.flex_col {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+}
+
+.legenda {
+	width: 60%;
+}
+.potencjaly {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }

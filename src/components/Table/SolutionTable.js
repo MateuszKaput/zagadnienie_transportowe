@@ -125,7 +125,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 								</div>
 							</div>
 							<div className="oneElement">
-								<p>Aktualna ścieżka po której przeszedł algorytm</p>
+								<p>Aktualne komórki BAZOWE </p>
 								<div className="tableDiv">
 									<table className="first_col">
 										<thead>

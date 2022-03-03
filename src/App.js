@@ -7,7 +7,7 @@ import UserExample from 'pages/userExample/UserExample';
 
 function App() {
 	return (
-		<div id="content" className="container">
+		<div>
 			<Routes>
 				<Route path="/" element={<Dashboard />}></Route>
 				<Route path="/main" element={<Main />}></Route>

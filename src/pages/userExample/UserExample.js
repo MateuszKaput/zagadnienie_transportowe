@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { useDidMount } from 'rooks';
 import Navbar from '../../components/Navbar/Navbar';
 import Table from '../../components/Table/Table';
 import './UserExample.css';
 import useDidMountEffect from '../../hooks/useDidMountEffect';
 import SolutionTable from 'components/Table/SolutionTable';
-import { Button, FormControl, Input, TextField } from '@mui/material';
+import { Button, FormControl, TextField } from '@mui/material';
 import { useForm } from 'hooks/useForm';
 import Swal from 'sweetalert2';
 
@@ -21,7 +20,6 @@ function UserExample() {
 			[0, 2, 2, 1],
 		],
 	});
-
 	const [dostawcy, , setDostawcy] = useForm({
 		dostawcy: 2,
 	});
@@ -29,7 +27,6 @@ function UserExample() {
 		jeden: 1,
 		dwa: 2,
 	});
-
 	const [odbiorcy, , setOdbiorcy] = useForm({
 		odbiorcy: 2,
 	});
@@ -37,13 +34,10 @@ function UserExample() {
 		jeden: 1,
 		dwa: 2,
 	});
-
 	const [wymagane, , setWymagane] = useForm();
 	const [wymaganeState, setWymaganeState] = useState();
-
 	const [oferowane, , setOferowane] = useForm();
 	const [oferowaneState, setOferowaneState] = useState();
-
 	const [ceny, , setCeny] = useForm();
 	const [cenyState, setCenyState] = useState();
 
@@ -55,24 +49,24 @@ function UserExample() {
 	const keepSolvingRef = useRef(true);
 
 	useDidMountEffect(() => {
-		let isSolved = true;
+		let isSolved = false;
+		let isRepeated = false;
 		let newPathTable = [];
 		let iteration = 1;
-		determinantTable[determinantTable.length - 1].forEach((singleDet) => {
+		determinantTable[determinantTable.length - 1].map((singleDet) => {
 			if (singleDet[0] > 0) {
-				isSolved = false;
+				isSolved = true;
 			}
 		});
 		if (isSolved) {
-		} else {
 			if (solutionsTable.length > 2) {
-				Object.values(solutionsTable).map((value, index) => {
-					console.log(value);
-				});
-				console.log('--------------------------');
+				for (let i = 0; i < solutionsTable.length - 2; i++) {
+					if (JSON.stringify(solutionsTable[solutionsTable.length - 1]) === JSON.stringify(solutionsTable[i])) {
+						isRepeated = true;
+					}
+				}
 			}
-
-			if (counter > 8) {
+			if (isRepeated) {
 			} else {
 				setCounter(counter + 1);
 				keepSolvingRef.current = true;
@@ -365,15 +359,27 @@ function UserExample() {
 	};
 
 	useDidMountEffect(() => {
-		wymaganeState === undefined ? errorPopup() : oferowaneState === undefined ? errorPopup() : cenyState === undefined ? errorPopup() : checkRepeat();
+		wymaganeState === undefined ? errorPopup() : oferowaneState === undefined ? errorPopup() : cenyState === undefined ? errorPopup() : checkBalanced();
 	}, [cenyState]);
 
-	function checkRepeat() {
-		convertData();
+	//Checking if required and offered values are the same.
+	function checkBalanced() {
+		let oferowane = 0;
+		let wymagane = 0;
+
+		Object.values(oferowaneState).map((value, index) => {
+			oferowane += parseInt(value);
+			return oferowane;
+		});
+		Object.values(wymaganeState).map((value, index) => {
+			wymagane += parseInt(value);
+			return wymagane;
+		});
+
+		oferowane === wymagane ? convertData() : notBalancedPopup();
 	}
 
 	useDidMountEffect(() => {
-		console.log('basic 2', basicData);
 		createEmptyArray(basicData);
 	}, [basicData]);
 
@@ -388,12 +394,15 @@ function UserExample() {
 
 		Object.values(wymaganeState).map((data, index) => {
 			required[index] = parseInt(data);
+			return required;
 		});
 		Object.values(oferowaneState).map((data, index) => {
 			offered[index] = parseInt(data);
+			return offered;
 		});
 		Object.values(cenyState).map((value, index) => {
 			rawPrices[index] = value;
+			return rawPrices;
 		});
 		for (let i = 0; i < rows; i++) {
 			prices[i] = [];
@@ -402,10 +411,19 @@ function UserExample() {
 			let x = parseInt(value.substr(5, 1));
 			let y = parseInt(value.substr(6, 1));
 			prices[x][y] = parseInt(cenyState[value]);
+			return prices;
 		});
 		setBasic({ rows: rows, columns: columns, required: required, offered: offered, prices: prices });
 	};
 
+	function notBalancedPopup() {
+		Swal.fire({
+			icon: 'error',
+			title: 'Ilość towarów wymaganych i oferowanych musi być taka sama',
+			showConfirmButton: false,
+			timer: 1000,
+		});
+	}
 	function errorPopup() {
 		Swal.fire({
 			icon: 'error',

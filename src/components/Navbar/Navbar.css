@@ -61,6 +61,7 @@
 .open-slider {
 	transform: translateX(0);
 }
+
 @media only screen and (min-width: 920px) {
 	.header {
 		justify-content: center;
@@ -71,10 +72,13 @@
 	.slider {
 		transform: translateX(0);
 		position: unset;
-		display: block;
-		width: auto;
+		display: flex;
+		justify-content: center;
+		width: 100%;
 		height: auto;
 		background: none;
+		background: black;
+		border-radius: 0 0 20px 20px;
 	}
 	.close {
 		display: none;
@@ -84,9 +88,9 @@
 		margin: 0;
 	}
 	.slider ul li Button {
-		color: black;
+		color: white;
 		padding: 0.75em 2em;
-		background-color: rgb(187, 186, 186);
+		background-color: rgb(46, 36, 36);
 		margin: 10px;
 	}
 }

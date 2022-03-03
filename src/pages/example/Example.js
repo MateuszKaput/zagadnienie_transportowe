@@ -36,22 +36,6 @@ function Example() {
 	const keepSolvingRef = useRef(true);
 
 	useDidMountEffect(() => {
-		console.log('Update pathTable', pathTable);
-	}, [pathTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update solutionsTable', solutionsTable);
-	}, [solutionsTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update determinantTable', determinantTable);
-	}, [determinantTable]);
-
-	useDidMountEffect(() => {
-		console.log('Update maxCellTable', maxCellTable);
-	}, [maxCellTable]);
-
-	useDidMountEffect(() => {
 		let isSolved = true;
 		let newPathTable = [];
 		let iteration = 1;
@@ -61,14 +45,10 @@ function Example() {
 			}
 		});
 		if (isSolved) {
-			console.log('Bingo rozwiązane! ');
-			console.log(solutionsTable);
+			console.log(determinantTable);
 		} else {
 			if (counter > 10) {
-				console.log('Brak optymalnego rozwiązania :C');
 			} else {
-				console.log('--------------------------------------------------------------------------------------------------------');
-				console.log('Rozpoczynam ponowną procedurę wyszukania z punktem nośnym: ', maxCellTable[maxCellTable.length - 1][1]);
 				setCounter(counter + 1);
 				keepSolvingRef.current = true;
 				findNewPath(maxCellTable[maxCellTable.length - 1][1], '', newPathTable, iteration);
@@ -239,31 +219,37 @@ function Example() {
 		const ultimateDet = [];
 		let max = [];
 		let detCounter = 0;
-		let singlePath = path;
 		let checkEngine = true;
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				singlePath.forEach((data, index) => {
+				path.forEach((data, index) => {
 					if (data[0] === i && data[1] === j) {
 						if (detRows[i] === undefined) {
 							if (detCol[j] === undefined) {
 								detRows[i] = 0;
 								detCol[j] = prices[i][j];
+								console.log('wypełniam wiersz: [', i, '] oraz kolumne [', j, ']', prices[i][j]);
 							} else {
 								detRows[i] = prices[i][j] - detCol[j];
+								console.log('wypełniam wiersz [', i, ']', prices[i][j], '-', detCol[j]);
 							}
-						} else {
+						} else if (detCol[j] === undefined) {
 							detCol[j] = prices[i][j] - detRows[i];
+							console.log('wypełniam kolumne [', j, ']', prices[i][j], '-', detRows[i]);
 						}
 					}
 				});
 			}
 		}
+
+		console.log(detCol, detRows);
+		console.log('-------------------');
+
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
 				checkEngine = true;
-				for (let k = 0; k < singlePath.length; k++) {
-					if (singlePath[k][0] === i && singlePath[k][1] === j) {
+				for (let k = 0; k < path.length; k++) {
+					if (path[k][0] === i && path[k][1] === j) {
 						checkEngine = false;
 					}
 				}
