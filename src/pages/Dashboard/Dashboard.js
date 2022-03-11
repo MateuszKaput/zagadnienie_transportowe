@@ -7,6 +7,9 @@ import pierwszeRozwiazanie from '../../images/transport2.JPG';
 import potencjalyPodstawowe1 from '../../images/transport3_1.JPG';
 import potencjalyPodstawowe2 from '../../images/transport3.JPG';
 import delty from '../../images/transport4.JPG';
+import nowaTrasa from '../../images/transport5.JPG';
+import numerowanie from '../../images/transport6.JPG';
+import przesuniecie from '../../images/transport7.JPG';
 
 const Dashboard = () => {
 	return (
@@ -142,7 +145,34 @@ const Dashboard = () => {
 						</div>
 					</div>
 					<b>
-						<li></li>
+						<li>W kolejnym kroku tworzymy cykl zaczynająć od kratki z największą deltą i przechodząc po kratkach bazowych</li>
+						<div className="singlepart">
+							<div className="obrazki1">
+								Wyznaczona nowa trasa zaznaczona czerwonymi strzałkami
+								<img src={nowaTrasa} alt="nowaTrasa"></img>
+							</div>
+							<div className="obrazki1">
+								Ponumerowane kratki nowo zaznaczonej trasy
+								<img src={numerowanie} alt="numerowanie"></img>
+							</div>
+						</div>
+					</b>
+					<b>
+						<li>Teraz następuje ostatnia faza jaką jest przesunięcie transortowanych wartości wedle schematu:</li>
+						<div className="singlepart">
+							<div className="obrazki">
+								<img src={przesuniecie} alt="nowaTrasa"></img>
+							</div>
+							<div className="legenda">
+								<ul>
+									<li>Teraz po obliczeniu minimum z parzystych kratek ([1,1][2,2][3,3]) "przesuwamy" je kolejno dodając w nieparzystych kratkach oraz odejmując w parzystych</li>
+									<li>Ważna uwaga. Kratka w której zaczynaliśmy cykl staje się teraz kratką BAZOWĄ a kratka z której wybraliśmy wartość minimalną zostaje usunięta z kratek BAZOWYCH</li>
+								</ul>
+							</div>
+						</div>
+					</b>
+					<b>
+						<li>W tym momencie wracamy do punktu 3 i rozpoczynamy obliczanie kolejnego przybliżenia. </li>
 					</b>
 				</ol>
 			</div>

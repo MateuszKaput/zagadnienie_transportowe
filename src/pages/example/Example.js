@@ -8,33 +8,93 @@ import SolutionTable from 'components/Table/SolutionTable';
 
 function Example() {
 	const [basicData] = useState({
-		rows: 3,
-		columns: 4,
-		required: [60, 80, 100],
-		offered: [40, 60, 80, 60],
-		prices: [
-			[1, 2, 3, 4],
-			[4, 3, 2, 0],
-			[0, 2, 2, 1],
-		],
 		// rows: 3,
-		// columns: 3,
-		// required: [50, 70, 30],
-		// offered: [20, 40, 90],
+		// columns: 4,
+		// required: [60, 80, 100],
+		// offered: [40, 60, 80, 60],
 		// prices: [
-		// 	[3, 5, 7],
-		// 	[12, 10, 9],
-		// 	[13, 3, 9],
+		// 	[1, 2, 3, 4],
+		// 	[4, 3, 2, 0],
+		// 	[0, 2, 2, 1],
 		// ],
+		rows: 3,
+		columns: 3,
+		required: [50, 70, 30],
+		offered: [20, 40, 90],
+		prices: [
+			[3, 5, 7],
+			[12, 10, 9],
+			[13, 3, 9],
+		],
 	});
 
 	const [counter, setCounter] = useState(0);
 	const [solutionsTable, updateSolutionsTable] = useState([]);
-	const [pathTable, updatePathTable] = useState([]);
+	const [visibleSolutions, updateVisibleSolutions] = useState([]);
+
+	const [basePoint, updateBasePoint] = useState([]);
 	const [determinantTable, updateDeterminantTable] = useState([]);
 	const [maxCellTable, updateMaxCellTable] = useState([]);
+	const [newPathsTable, updateNewPaths] = useState([]);
+	const [historyTable, updateHistory] = useState([]);
 	const keepSolvingRef = useRef(true);
 
+	function makeTables({ rows, columns }) {
+		let totalTable = [];
+		let totalSolutions = [];
+		for (let y = 0; y < newPathsTable.length; y++) {
+			let middleTable = [];
+			for (let u = 0; u < newPathsTable[y].length; u++) {
+				let table = [];
+				let singleSolution = [];
+
+				for (let i = 0; i < rows + 1; i++) {
+					singleSolution[i] = [];
+				}
+				for (let a = 0; a < rows + 1; a++) {
+					for (let b = 0; b < columns + 1; b++) {
+						if (a === 0) {
+							if (b === 0) {
+								singleSolution[a][b] = 'Transport';
+							} else {
+								singleSolution[a][b] = 'Dostawca ' + b;
+							}
+						} else if (b === 0) {
+							singleSolution[a][b] = 'Odbiorca ' + a;
+						} else {
+							singleSolution[a][b] = solutionsTable[y][a - 1][b - 1];
+						}
+					}
+				}
+				totalSolutions[y] = singleSolution;
+				for (let k = 0; k < rows + 1; k++) {
+					table[k] = [];
+				}
+
+				for (let i = 0; i < columns + 1; i++) {
+					i === 0 ? (table[0][i] = 'Algorytm') : (table[0][i] = 'Dostawca ' + i);
+				}
+
+				for (let j = 1; j < rows + 1; j++) {
+					table[j][0] = 'Odbiorca ' + j;
+				}
+
+				for (let p = 1; p < rows + 1; p++) {
+					for (let q = 1; q < columns + 1; q++) {
+						table[p][q] = 0;
+					}
+				}
+
+				for (let m = 0; m <= u; m++) {
+					table[newPathsTable[y][m][0] + 1][newPathsTable[y][m][1] + 1] = solutionsTable[y][newPathsTable[y][m][0]][[newPathsTable[y][m][1]]];
+				}
+				middleTable[u] = table;
+			}
+			totalTable[y] = middleTable;
+		}
+		updateHistory(totalTable);
+		updateVisibleSolutions(totalSolutions);
+	}
 	useDidMountEffect(() => {
 		let isSolved = true;
 		let newPathTable = [];
@@ -45,7 +105,7 @@ function Example() {
 			}
 		});
 		if (isSolved) {
-			console.log(determinantTable);
+			makeTables(basicData);
 		} else {
 			if (counter > 10) {
 			} else {
@@ -59,17 +119,7 @@ function Example() {
 	const makeNextSolutionTable = (newPath, max) => {
 		let min = [];
 		const banana = [];
-		const modowanypathTable = [];
-
-		for (let i = 0; i < pathTable[pathTable.length - 1].length; i++) {
-			modowanypathTable[i] = [];
-		}
-		for (let i = 0; i < pathTable[pathTable.length - 1].length; i++) {
-			pathTable[pathTable.length - 1].forEach((orange, index) => {
-				modowanypathTable[index][0] = orange[0];
-				modowanypathTable[index][1] = orange[1];
-			});
-		}
+		const modowanypathTable = [...basePoint[basePoint.length - 1]];
 
 		for (let i = 0; i < basicData.rows; i++) {
 			banana[i] = [];
@@ -85,6 +135,7 @@ function Example() {
 				banana[i][index] = apple;
 			});
 		}
+
 		for (let i = 1; i < newPath.length; i++) {
 			let cor1 = newPath[i][0];
 			let cor2 = newPath[i][1];
@@ -111,22 +162,24 @@ function Example() {
 				modowanypathTable[j][1] = max[1][1];
 			}
 		}
-		updatePathTable([...pathTable, modowanypathTable]);
+		updateNewPaths([...newPathsTable, newPath]);
+		updateBasePoint([...basePoint, modowanypathTable]);
 		calculateDeterminants(basicData, modowanypathTable);
 		updateSolutionsTable([...solutionsTable, banana]);
 	};
 
 	const findNewPath = (actuallPoint, fromDirection, newPathTable, iteration) => {
-		if (actuallPoint[0] === maxCellTable[maxCellTable.length - 1][1][0] && actuallPoint[1] === maxCellTable[maxCellTable.length - 1][1][1] && newPathTable.length > 0) {
+		let maxCell = maxCellTable[maxCellTable.length - 1];
+		if (actuallPoint[0] === maxCell[1][0] && actuallPoint[1] === maxCell[1][1] && newPathTable.length > 0) {
 			keepSolvingRef.current = false;
-			makeNextSolutionTable(newPathTable, maxCellTable[maxCellTable.length - 1]);
+			makeNextSolutionTable(newPathTable, maxCell);
 		} else {
 			if (newPathTable.length === 0) {
 				newPathTable[0] = actuallPoint;
 			}
 			if (!(fromDirection === 'left') && !(fromDirection === 'right')) {
 				for (let i = 0; i < actuallPoint[1]; i++) {
-					pathTable[pathTable.length - 1].forEach((key, index) => {
+					basePoint[basePoint.length - 1].forEach((key, index) => {
 						if (key[0] === actuallPoint[0] && key[1] === i) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
@@ -136,7 +189,7 @@ function Example() {
 							if (keepSolvingRef.current) {
 								findNewPath([actuallPoint[0], i], 'right', copyNewPatch, iterationCopy);
 							}
-						} else if (maxCellTable[maxCellTable.length - 1][1][0] === actuallPoint[0] && maxCellTable[maxCellTable.length - 1][1][1] === i) {
+						} else if (maxCell[1][0] === actuallPoint[0] && maxCell[1][1] === i) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
 							if (keepSolvingRef.current) {
@@ -148,7 +201,7 @@ function Example() {
 			}
 			if (!(fromDirection === 'top') && !(fromDirection === 'bottom')) {
 				for (let i = 0; i < actuallPoint[0]; i++) {
-					pathTable[pathTable.length - 1].forEach((key) => {
+					basePoint[basePoint.length - 1].forEach((key) => {
 						if (key[0] === i && key[1] === actuallPoint[1]) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
@@ -158,7 +211,7 @@ function Example() {
 							if (keepSolvingRef.current) {
 								findNewPath([i, actuallPoint[1]], 'bottom', copyNewPatch, iterationCopy);
 							}
-						} else if (maxCellTable[maxCellTable.length - 1][1][0] === i && maxCellTable[maxCellTable.length - 1][1][1] === actuallPoint[1]) {
+						} else if (maxCell[1][0] === i && maxCell[1][1] === actuallPoint[1]) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
 							if (keepSolvingRef.current) {
@@ -170,7 +223,7 @@ function Example() {
 			}
 			if (!(fromDirection === 'right') && !(fromDirection === 'left')) {
 				for (let i = solutionsTable[solutionsTable.length - 1][0].length - 1; i > actuallPoint[1]; i--) {
-					pathTable[pathTable.length - 1].forEach((key, index) => {
+					basePoint[basePoint.length - 1].forEach((key, index) => {
 						if (key[0] === actuallPoint[0] && key[1] === i) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
@@ -179,7 +232,7 @@ function Example() {
 							if (keepSolvingRef.current) {
 								findNewPath([actuallPoint[0], i], 'left', copyNewPatch, iterationCopy);
 							}
-						} else if (maxCellTable[maxCellTable.length - 1][1][0] === actuallPoint[0] && maxCellTable[maxCellTable.length - 1][1][1] === i) {
+						} else if (maxCell[1][0] === actuallPoint[0] && maxCell[1][1] === i) {
 							let iterationCopy = iteration;
 							let copyNewPatch = [...newPathTable];
 							if (keepSolvingRef.current) {
@@ -191,18 +244,16 @@ function Example() {
 			}
 			if (!(fromDirection === 'bottom') && !(fromDirection === 'top')) {
 				for (let i = Object.keys(solutionsTable[solutionsTable.length - 1]).length - 1; i > actuallPoint[0]; i--) {
-					pathTable[pathTable.length - 1].forEach((key, index) => {
+					basePoint[basePoint.length - 1].forEach((key, index) => {
+						let iterationCopy = iteration;
+						let copyNewPatch = [...newPathTable];
 						if (key[0] === i && key[1] === actuallPoint[1]) {
-							let iterationCopy = iteration;
-							let copyNewPatch = [...newPathTable];
 							copyNewPatch[iterationCopy] = [i, actuallPoint[1]];
 							iterationCopy++;
 							if (keepSolvingRef.current) {
 								findNewPath([i, actuallPoint[1]], 'top', copyNewPatch, iterationCopy);
 							}
-						} else if (i === maxCellTable[maxCellTable.length - 1][1][0] && actuallPoint[1] === maxCellTable[maxCellTable.length - 1][1][1]) {
-							let iterationCopy = iteration;
-							let copyNewPatch = [...newPathTable];
+						} else if (i === maxCell[1][0] && actuallPoint[1] === maxCell[1][1]) {
 							if (keepSolvingRef.current) {
 								findNewPath([i, actuallPoint[1]], 'top', copyNewPatch, iterationCopy);
 							}
@@ -228,22 +279,16 @@ function Example() {
 							if (detCol[j] === undefined) {
 								detRows[i] = 0;
 								detCol[j] = prices[i][j];
-								console.log('wypełniam wiersz: [', i, '] oraz kolumne [', j, ']', prices[i][j]);
 							} else {
 								detRows[i] = prices[i][j] - detCol[j];
-								console.log('wypełniam wiersz [', i, ']', prices[i][j], '-', detCol[j]);
 							}
 						} else if (detCol[j] === undefined) {
 							detCol[j] = prices[i][j] - detRows[i];
-							console.log('wypełniam kolumne [', j, ']', prices[i][j], '-', detRows[i]);
 						}
 					}
 				});
 			}
 		}
-
-		console.log(detCol, detRows);
-		console.log('-------------------');
 
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
@@ -277,6 +322,7 @@ function Example() {
 		const sprzedawcy = { ...offered };
 		const kupcy = { ...required };
 		const path = [];
+		const basePoints = [];
 		let row = 0;
 		let column = 0;
 		let stepCount = 0;
@@ -286,6 +332,7 @@ function Example() {
 				sprzedawcy[column] -= kupcy[row];
 				kupcy[row] -= kupcy[row];
 				path[stepCount] = [row, column];
+				basePoints[stepCount] = [row, column];
 				row++;
 				stepCount++;
 			} else if (sprzedawcy[column] < kupcy[row]) {
@@ -293,6 +340,7 @@ function Example() {
 				kupcy[row] -= sprzedawcy[column];
 				sprzedawcy[column] -= sprzedawcy[column];
 				path[stepCount] = [row, column];
+				basePoints[stepCount] = [row, column];
 				column++;
 				stepCount++;
 			} else if (sprzedawcy[column] === kupcy[row]) {
@@ -300,19 +348,22 @@ function Example() {
 				kupcy[row] -= sprzedawcy[column];
 				sprzedawcy[column] -= sprzedawcy[column];
 				path[stepCount] = [row, column];
+				basePoints[stepCount] = [row, column];
 				if (row === required.length - 1 && column === offered.length - 1) {
 					row++;
 					column++;
 					stepCount++;
 				} else {
 					path[stepCount + 1] = [row + 1, column];
+					basePoints[stepCount + 1] = [row + 1, column];
 					row++;
 					column++;
 					stepCount += 2;
 				}
 			}
 		}
-		updatePathTable([...pathTable, path]);
+		updateNewPaths([...newPathsTable, path]);
+		updateBasePoint([...basePoint, basePoints]);
 		calculateDeterminants(basicData, path);
 		updateSolutionsTable([...solutionsTable, firstSolved]);
 	};
@@ -334,9 +385,8 @@ function Example() {
 		<div className="container">
 			<Navbar />
 			<div className="box">
-				<h2>Dane wejściowe</h2>
 				<Table dane={basicData} />
-				<SolutionTable solutionsTable={solutionsTable} pathTable={pathTable} determinantTable={determinantTable} maxCellTable={maxCellTable} />
+				<SolutionTable solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);

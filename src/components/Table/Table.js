@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Table.css';
 
 function Table({ dane: { required, offered, prices } }) {
-	return (
-		<>
+	const [isData, setIsData] = useState(false);
+
+	useEffect(() => {
+		if (required === undefined && offered === undefined && prices === undefined) {
+		} else {
+			setIsData(true);
+		}
+	}, [required, offered, prices]);
+
+	return !isData ? (
+		<></>
+	) : (
+		<div className="section">
+			<h2>Dane wejściowe</h2>
 			<div className="firstPart">
 				<div className="div_odbiorcy">
 					<h5>Zapotrzebowanie poszczególnych odbiorców na towar</h5>
@@ -81,7 +93,7 @@ function Table({ dane: { required, offered, prices } }) {
 					</table>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

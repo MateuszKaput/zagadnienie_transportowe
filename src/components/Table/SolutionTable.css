@@ -3,6 +3,15 @@
 	flex-direction: column;
 	gap: 1rem;
 }
+.sekcja {
+	gap: 1rem;
+	background-color: rgb(151, 180, 182);
+	border-radius: 10px;
+	padding: 1rem;
+}
+ul {
+	list-style: none;
+}
 .divSingleRow {
 	display: flex;
 	flex-direction: row;
@@ -11,9 +20,14 @@
 	flex-shrink: 1;
 	justify-content: center;
 	text-align: center;
+	margin-bottom: 1rem;
 }
 .divSingleRow p {
 	flex-shrink: 1;
+}
+
+td {
+	background-color: rgb(195, 240, 240);
 }
 
 .tableDiv {
@@ -30,7 +44,6 @@
 	margin: 0 auto;
 	flex-basis: 0;
 }
-
 @media only screen and (max-width: 1100px) {
 	.divSingleRow {
 		flex-direction: column;

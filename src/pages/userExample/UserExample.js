@@ -9,17 +9,8 @@ import { useForm } from 'hooks/useForm';
 import Swal from 'sweetalert2';
 
 function UserExample() {
-	const [basicData, setBasic] = useState({
-		rows: 3,
-		columns: 4,
-		required: [60, 80, 100],
-		offered: [40, 60, 80, 60],
-		prices: [
-			[1, 2, 3, 4],
-			[4, 3, 2, 0],
-			[0, 2, 2, 1],
-		],
-	});
+	const [basicData, setBasic] = useState({});
+
 	const [dostawcy, , setDostawcy] = useForm({
 		dostawcy: 2,
 	});
@@ -35,6 +26,11 @@ function UserExample() {
 		dwa: 2,
 	});
 	const [wymagane, , setWymagane] = useForm();
+
+	const [fikcyjnyDostawca, setFikcyjnyDostawca] = useState(false);
+	const [fikcyjnyOdbiorca, setfikcyjnyOdbiorca] = useState(false);
+	const [roznica, setRoznica] = useState(0);
+
 	const [wymaganeState, setWymaganeState] = useState();
 	const [oferowane, , setOferowane] = useForm();
 	const [oferowaneState, setOferowaneState] = useState();
@@ -43,22 +39,90 @@ function UserExample() {
 
 	const [counter, setCounter] = useState(0);
 	const [solutionsTable, updateSolutionsTable] = useState([]);
+	const [visibleSolutions, updateVisibleSolutions] = useState([]);
+
 	const [pathTable, updatePathTable] = useState([]);
 	const [determinantTable, updateDeterminantTable] = useState([]);
 	const [maxCellTable, updateMaxCellTable] = useState([]);
+	const [historyTable, updateHistory] = useState([]);
+	const [historyMainValues, setMainHistory] = useState([]);
+	const [newPathsTable, updateNewPaths] = useState([]);
 	const keepSolvingRef = useRef(true);
 
+	function makeTables() {
+		let rows = Object.keys(odbiorcyState).length;
+		let columns = Object.keys(dostawcyState).length;
+		let totalHistory = [];
+		let totalSolutions = [];
+		for (let y = 0; y < newPathsTable.length; y++) {
+			let middleHistory = [];
+			let singleSolution = [];
+
+			for (let i = 0; i < rows + 1; i++) {
+				singleSolution[i] = [];
+			}
+			for (let a = 0; a < rows + 1; a++) {
+				for (let b = 0; b < columns + 1; b++) {
+					if (a === 0) {
+						if (b === 0) {
+							singleSolution[a][b] = 'Transport';
+						} else {
+							singleSolution[a][b] = 'Dostawca ' + b;
+						}
+					} else if (b === 0) {
+						singleSolution[a][b] = 'Odbiorca ' + a;
+					} else {
+						singleSolution[a][b] = solutionsTable[y][a - 1][b - 1];
+					}
+				}
+			}
+			totalSolutions[y] = singleSolution;
+			for (let u = 0; u < newPathsTable[y].length; u++) {
+				let singleHistory = [];
+
+				for (let k = 0; k < rows + 1; k++) {
+					singleHistory[k] = [];
+				}
+
+				for (let i = 0; i < columns + 1; i++) {
+					i === 0 ? (singleHistory[0][i] = 'Transport') : y === 0 ? (singleHistory[0][i] = historyMainValues[u][1][i - 1]) : (singleHistory[0][i] = 'Dostawca ' + i);
+				}
+
+				for (let j = 1; j < rows + 1; j++) {
+					y === 0 ? (singleHistory[j][0] = historyMainValues[u][0][j - 1]) : (singleHistory[j][0] = 'Odbiorca ' + j);
+				}
+
+				for (let p = 1; p < rows + 1; p++) {
+					for (let q = 1; q < columns + 1; q++) {
+						singleHistory[p][q] = 0;
+					}
+				}
+
+				for (let m = 0; m <= u; m++) {
+					singleHistory[newPathsTable[y][m][0] + 1][newPathsTable[y][m][1] + 1] = solutionsTable[y][newPathsTable[y][m][0]][[newPathsTable[y][m][1]]];
+				}
+				middleHistory[u] = singleHistory;
+			}
+			totalHistory[y] = middleHistory;
+		}
+		console.log('Total history: ', totalHistory);
+		console.log('Solutions table: ', totalSolutions);
+		console.log('Old Solutions table: ', solutionsTable);
+		updateHistory(totalHistory);
+		updateVisibleSolutions(totalSolutions);
+	}
+
 	useDidMountEffect(() => {
-		let isSolved = false;
+		let isUnsolved = false;
 		let isRepeated = false;
 		let newPathTable = [];
 		let iteration = 1;
 		determinantTable[determinantTable.length - 1].map((singleDet) => {
 			if (singleDet[0] > 0) {
-				isSolved = true;
+				isUnsolved = true;
 			}
 		});
-		if (isSolved) {
+		if (isUnsolved) {
 			if (solutionsTable.length > 2) {
 				for (let i = 0; i < solutionsTable.length - 2; i++) {
 					if (JSON.stringify(solutionsTable[solutionsTable.length - 1]) === JSON.stringify(solutionsTable[i])) {
@@ -67,11 +131,14 @@ function UserExample() {
 				}
 			}
 			if (isRepeated) {
+				makeTables();
 			} else {
 				setCounter(counter + 1);
 				keepSolvingRef.current = true;
 				findNewPath(maxCellTable[maxCellTable.length - 1][1], '', newPathTable, iteration);
 			}
+		} else {
+			makeTables();
 		}
 	}, [maxCellTable]);
 
@@ -130,6 +197,7 @@ function UserExample() {
 				modowanypathTable[j][1] = max[1][1];
 			}
 		}
+		updateNewPaths([...newPathsTable, newPath]);
 		updatePathTable([...pathTable, modowanypathTable]);
 		calculateDeterminants(basicData, modowanypathTable);
 		updateSolutionsTable([...solutionsTable, banana]);
@@ -286,26 +354,37 @@ function UserExample() {
 	};
 
 	const solveFirstTime = (tempTable, { required, offered }) => {
+		let hisMain = [[]];
+		let rows = required.length;
+		let cols = offered.length;
 		const firstSolved = [...tempTable];
 		const sprzedawcy = { ...offered };
 		const kupcy = { ...required };
+
 		const path = [];
+		const basePoints = [];
 		let row = 0;
 		let column = 0;
 		let stepCount = 0;
-		while (row < required.length && column < offered.length) {
+
+		while (row < rows && column < cols) {
+			hisMain[stepCount] = [[], []];
 			if (kupcy[row] < sprzedawcy[column]) {
 				firstSolved[row][column] = kupcy[row];
 				sprzedawcy[column] -= kupcy[row];
 				kupcy[row] -= kupcy[row];
+
 				path[stepCount] = [row, column];
+				basePoints[stepCount] = [row, column];
 				row++;
 				stepCount++;
 			} else if (sprzedawcy[column] < kupcy[row]) {
 				firstSolved[row][column] = sprzedawcy[column];
 				kupcy[row] -= sprzedawcy[column];
 				sprzedawcy[column] -= sprzedawcy[column];
+
 				path[stepCount] = [row, column];
+				basePoints[stepCount] = [row, column];
 				column++;
 				stepCount++;
 			} else if (sprzedawcy[column] === kupcy[row]) {
@@ -313,19 +392,30 @@ function UserExample() {
 				kupcy[row] -= sprzedawcy[column];
 				sprzedawcy[column] -= sprzedawcy[column];
 				path[stepCount] = [row, column];
-				if (row === required.length - 1 && column === offered.length - 1) {
+				basePoints[stepCount] = [row, column];
+				if (row === rows - 1 && column === cols - 1) {
 					row++;
 					column++;
 					stepCount++;
 				} else {
 					path[stepCount + 1] = [row + 1, column];
+					basePoints[stepCount + 1] = [row + 1, column];
 					row++;
 					column++;
 					stepCount += 2;
 				}
 			}
+
+			Object.values(kupcy).map((value, index) => {
+				hisMain[stepCount - 1][0][index] = value;
+			});
+			Object.values(sprzedawcy).map((value, index) => {
+				hisMain[stepCount - 1][1][index] = value;
+			});
 		}
-		updatePathTable([...pathTable, path]);
+		setMainHistory(hisMain);
+		updateNewPaths([...newPathsTable, path]);
+		updatePathTable([...pathTable, basePoints]);
 		calculateDeterminants(basicData, path);
 		updateSolutionsTable([...solutionsTable, firstSolved]);
 	};
@@ -359,34 +449,13 @@ function UserExample() {
 	};
 
 	useDidMountEffect(() => {
-		wymaganeState === undefined ? errorPopup() : oferowaneState === undefined ? errorPopup() : cenyState === undefined ? errorPopup() : checkBalanced();
-	}, [cenyState]);
-
-	//Checking if required and offered values are the same.
-	function checkBalanced() {
-		let oferowane = 0;
-		let wymagane = 0;
-
-		Object.values(oferowaneState).map((value, index) => {
-			oferowane += parseInt(value);
-			return oferowane;
-		});
-		Object.values(wymaganeState).map((value, index) => {
-			wymagane += parseInt(value);
-			return wymagane;
-		});
-
-		oferowane === wymagane ? convertData() : notBalancedPopup();
-	}
-
-	useDidMountEffect(() => {
 		createEmptyArray(basicData);
 	}, [basicData]);
 
-	const convertData = () => {
+	const convertData = (odbiorcy, dostawcy) => {
 		confirmation();
-		let rows = Object.keys(odbiorcyState).length;
-		let columns = Object.keys(dostawcyState).length;
+		let rows = Object.keys(odbiorcy).length;
+		let columns = Object.keys(dostawcy).length;
 		let required = [];
 		let offered = [];
 		let prices = [];
@@ -407,7 +476,9 @@ function UserExample() {
 		for (let i = 0; i < rows; i++) {
 			prices[i] = [];
 		}
+		console.log('cenystate: ', cenyState);
 		Object.keys(cenyState).map((value, index) => {
+			console.log('wartość: value', value);
 			let x = parseInt(value.substr(5, 1));
 			let y = parseInt(value.substr(6, 1));
 			prices[x][y] = parseInt(cenyState[value]);
@@ -416,14 +487,6 @@ function UserExample() {
 		setBasic({ rows: rows, columns: columns, required: required, offered: offered, prices: prices });
 	};
 
-	function notBalancedPopup() {
-		Swal.fire({
-			icon: 'error',
-			title: 'Ilość towarów wymaganych i oferowanych musi być taka sama',
-			showConfirmButton: false,
-			timer: 1000,
-		});
-	}
 	function errorPopup() {
 		Swal.fire({
 			icon: 'error',
@@ -432,7 +495,7 @@ function UserExample() {
 			timer: 1000,
 		});
 	}
-	function confirmation(dane) {
+	function confirmation() {
 		Swal.fire({
 			icon: 'success',
 			title: 'Rozpoczynam obliczanie optymalnego rozwiązania',
@@ -441,25 +504,95 @@ function UserExample() {
 		});
 	}
 
+	useDidMountEffect(() => {
+		if (wymaganeState === undefined || oferowaneState === undefined || cenyState === undefined) {
+			errorPopup();
+		} else {
+			let ileDostawcow = Object.keys(dostawcyState).length;
+			let ileOdbiorcow = Object.keys(odbiorcyState).length;
+			let ileCen = Object.keys(cenyState).length;
+
+			console.log('Sprawdzanko: ', ileDostawcow, ileOdbiorcow, ileCen);
+			if (ileDostawcow * ileOdbiorcow === ileCen) {
+				let sumaDostawcy = 0;
+				let sumaOdbiorcy = 0;
+
+				Object.values(oferowaneState).map((value, index) => {
+					sumaDostawcy += parseInt(value);
+				});
+				Object.values(wymaganeState).map((value, index) => {
+					sumaOdbiorcy += parseInt(value);
+				});
+				if (sumaDostawcy > sumaOdbiorcy) {
+					let diff = sumaDostawcy - sumaOdbiorcy;
+					setRoznica(diff);
+					nowyOdbiorca(diff, odbiorcyState, dostawcyState);
+				} else if (sumaOdbiorcy > sumaDostawcy) {
+					let diff = sumaOdbiorcy - sumaDostawcy;
+					setRoznica(diff);
+					nowyDostawca(diff, dostawcyState, odbiorcyState, oferowaneState);
+				} else {
+					convertData(odbiorcyState, dostawcyState);
+				}
+			} else {
+				console.log('Nie podano wszystkich danych', cenyState);
+			}
+		}
+	}, [cenyState]);
+
+	function calculateSolution() {
+		setCenyState(ceny);
+	}
+
+	function nowyDostawca(value) {
+		console.log('Długość odbiorcy: ', Object.keys(odbiorcyState).length);
+		setFikcyjnyDostawca(true);
+		let dostawcyKopia = { ...dostawcyState };
+		dostawcyKopia = { ...dostawcyKopia, nowy: 0 };
+		setDostawcyState(dostawcyKopia);
+
+		let oferowaneKopia = { ...oferowaneState };
+		oferowaneKopia = { ...oferowaneKopia, nowy: value };
+		setOferowaneState(oferowaneKopia);
+
+		let cenyKopia = { ...cenyState };
+		console.log(odbiorcyState, Object.keys(odbiorcyState).length);
+		for (let i = 0; i < Object.keys(odbiorcyState).length; i++) {
+			let string = 'numer' + i + Object.keys(dostawcyState).length;
+			cenyKopia = { ...cenyKopia, [`${string}`]: '0' };
+		}
+		console.log('Nowy Dostawca: ', cenyKopia);
+		setCenyState(cenyKopia);
+	}
+
+	function nowyOdbiorca(value) {
+		console.log('Długość dostawcy: ', Object.keys(dostawcyState).length);
+		setfikcyjnyOdbiorca(true);
+		let odbiorcykopia = { ...odbiorcyState };
+		odbiorcykopia = { ...odbiorcykopia, nowy: 0 };
+		setOdbiorcyState(odbiorcykopia);
+
+		let wymaganeKopia = { ...wymaganeState };
+		wymaganeKopia = { ...wymaganeKopia, nowy: value };
+		setWymaganeState(wymaganeKopia);
+
+		let cenyKopia = { ...cenyState };
+		for (let i = 0; i < Object.keys(dostawcyState).length; i++) {
+			let string = 'numer' + Object.keys(odbiorcyState).length + i;
+			cenyKopia = { ...cenyKopia, [`${string}`]: '0' };
+		}
+		console.log('Nowy Odbiorca: ', cenyKopia);
+		setCenyState(cenyKopia);
+	}
 	return (
 		<div className="container">
 			<Navbar />
 			<div className="box">
 				<div className="flexRows">
 					<div className="singleRow">
-						{/* Dostawcy/odbiorcy */}
 						<div>
 							<FormControl className="flexForm">
-								<TextField
-									type="number"
-									inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }}
-									required
-									fullWidth
-									margin="normal"
-									label={'Liczba dostawców'}
-									variant="outlined"
-									onChange={setDostawcy('dostawcy')}
-								/>
+								<TextField type="number" inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth margin="normal" label={'Liczba dostawców'} variant="outlined" onChange={setDostawcy('dostawcy')} />
 								<Button variant="contained" onClick={() => dostawcyLenght()}>
 									{'Zatwiedź dostawców'}
 								</Button>
@@ -467,16 +600,7 @@ function UserExample() {
 						</div>
 						<div>
 							<FormControl className="flexForm">
-								<TextField
-									type="number"
-									inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }}
-									required
-									fullWidth
-									margin="normal"
-									label={'Liczba odbiorców'}
-									variant="outlined"
-									onChange={setOdbiorcy('odbiorcy')}
-								/>
+								<TextField type="number" inputProps={{ style: { textAlign: 'center' }, inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth margin="normal" label={'Liczba odbiorców'} variant="outlined" onChange={setOdbiorcy('odbiorcy')} />
 								<Button variant="contained" onClick={() => odbiorcyLenght()}>
 									{'Zatwiedź  odbiorców'}
 								</Button>
@@ -487,29 +611,71 @@ function UserExample() {
 						<FormControl className="flexForm">
 							<table>
 								<thead>
-									<tr>
-										{Object.keys(dostawcyState).map((element, index) => (
-											<td key={index}>Dostawca {index + 1}</td>
-										))}
-									</tr>
+									{fikcyjnyDostawca ? (
+										<tr>{Object.keys(dostawcyState).map((element, index) => (index === Object.keys(dostawcyState).length - 1 ? <td>Fikcyjny dostawca</td> : <td>Dostawca {index + 1}</td>))}</tr>
+									) : (
+										<tr>
+											{Object.keys(dostawcyState).map((element, index) => (
+												<td>Dostawca {index + 1}</td>
+											))}
+										</tr>
+									)}
 								</thead>
 								<tbody>
-									<tr>
-										{Object.keys(dostawcyState).map((element, index) => (
-											<td key={index}>
-												<TextField
-													type="number"
-													inputProps={{
-														style: { textAlign: 'center' },
-														inputMode: 'numeric',
-														pattern: '[0-9]*',
-													}}
-													placeholder={'Ilośc towaru'}
-													onChange={setOferowane('numer' + index)}
-												/>
-											</td>
-										))}
-									</tr>
+									{fikcyjnyDostawca ? (
+										<tr>
+											{Object.keys(dostawcyState).map((element, index) =>
+												index === Object.keys(dostawcyState).length - 1 ? (
+													<td>
+														<TextField
+															type="number"
+															disabled
+															inputProps={{
+																style: {
+																	textAlign: 'center',
+																},
+																inputMode: 'numeric',
+																pattern: '[0-9]*',
+															}}
+															value={roznica}
+														/>
+													</td>
+												) : (
+													<td>
+														<TextField
+															type="number"
+															inputProps={{
+																style: {
+																	textAlign: 'center',
+																},
+																inputMode: 'numeric',
+																pattern: '[0-9]*',
+															}}
+															placeholder={'Ilośc towaru'}
+															onChange={setOferowane('numer' + index)}
+														/>
+													</td>
+												)
+											)}
+										</tr>
+									) : (
+										<tr>
+											{Object.keys(dostawcyState).map((element, index) => (
+												<td>
+													<TextField
+														type="number"
+														inputProps={{
+															style: { textAlign: 'center' },
+															inputMode: 'numeric',
+															pattern: '[0-9]*',
+														}}
+														placeholder={'Ilośc towaru'}
+														onChange={setOferowane('numer' + index)}
+													/>
+												</td>
+											))}
+										</tr>
+									)}
 								</tbody>
 							</table>
 							<Button variant="contained" onClick={() => setOferowaneState(oferowane)}>
@@ -521,29 +687,59 @@ function UserExample() {
 						<FormControl className="flexForm">
 							<table>
 								<thead>
-									<tr>
-										{Object.keys(odbiorcyState).map((element, index) => (
-											<td key={index}>Odbiorca {index + 1}</td>
-										))}
-									</tr>
+									<tr>{Object.keys(odbiorcyState).map((element, index) => (fikcyjnyOdbiorca && index === Object.keys(odbiorcyState).length - 1 ? <td>Fikcyjny Odbiorca </td> : <td>Odbiorca {index + 1}</td>))}</tr>
 								</thead>
 								<tbody>
-									<tr>
-										{Object.keys(odbiorcyState).map((element, index) => (
-											<td key={index}>
-												<TextField
-													type="number"
-													inputProps={{
-														style: { textAlign: 'center' },
-														inputMode: 'numeric',
-														pattern: '[0-9]*',
-													}}
-													placeholder={'Ilośc towaru'}
-													onChange={setWymagane('numer' + index)}
-												/>
-											</td>
-										))}
-									</tr>
+									{fikcyjnyOdbiorca ? (
+										<tr>
+											{Object.keys(odbiorcyState).map((element, index) =>
+												index === Object.keys(odbiorcyState).length - 1 ? (
+													<td>
+														<TextField
+															type="number"
+															inputProps={{
+																style: { textAlign: 'center' },
+																inputMode: 'numeric',
+																pattern: '[0-9]*',
+															}}
+															disabled
+															value={roznica}
+														/>
+													</td>
+												) : (
+													<td>
+														<TextField
+															type="number"
+															inputProps={{
+																style: { textAlign: 'center' },
+																inputMode: 'numeric',
+																pattern: '[0-9]*',
+															}}
+															placeholder={'Ilośc towaru'}
+															onChange={setWymagane('numer' + index)}
+														/>
+													</td>
+												)
+											)}
+										</tr>
+									) : (
+										<tr>
+											{Object.keys(odbiorcyState).map((element, index) => (
+												<td>
+													<TextField
+														type="number"
+														inputProps={{
+															style: { textAlign: 'center' },
+															inputMode: 'numeric',
+															pattern: '[0-9]*',
+														}}
+														placeholder={'Ilośc towaru'}
+														onChange={setWymagane('numer' + index)}
+													/>
+												</td>
+											))}
+										</tr>
+									)}
 								</tbody>
 							</table>
 							<Button variant="contained" onClick={() => setWymaganeState(wymagane)}>
@@ -560,14 +756,13 @@ function UserExample() {
 											<td>Ceny</td>
 										</tr>
 										{Object.keys(odbiorcyState).map((element, index) => (
-											<tr key={index}>
-												<td key={index}>
-													<TextField
-														inputProps={{ style: { textAlign: 'center' } }}
-														variant="standard"
-														size="small"
-														value={'Odbiorca ' + ++index}
-													/>
+											<tr>
+												<td>
+													{fikcyjnyOdbiorca && index === Object.keys(odbiorcyState).length - 1 ? (
+														<TextField inputProps={{ style: { textAlign: 'center' } }} variant="standard" size="small" value={'Fikcyjny Odbiorca '} />
+													) : (
+														<TextField inputProps={{ style: { textAlign: 'center' } }} variant="standard" size="small" value={'Odbiorca ' + ++index} />
+													)}
 												</td>
 											</tr>
 										))}
@@ -575,48 +770,78 @@ function UserExample() {
 								</table>
 								<table className="rows">
 									<thead>
-										<tr>
-											{Object.keys(dostawcyState).map((element, index) => (
-												<td key={index}>Dostawca {index + 1}</td>
-											))}
-										</tr>
+										<tr>{Object.keys(dostawcyState).map((element, index) => (fikcyjnyDostawca && index === Object.keys(dostawcyState).length - 1 ? <td>Fikcyjny Dostawca</td> : <td>Dostawca {index + 1}</td>))}</tr>
 									</thead>
 									<tbody>
 										{Object.keys(odbiorcyState).map((element, index) => (
-											<tr key={index}>
-												{Object.keys(dostawcyState).map((element, index1) => (
-													<td key={index1}>
-														<TextField
-															type="number"
-															variant="standard"
-															size="small"
-															inputProps={{
-																style: {
-																	textAlign: 'center',
-																},
-																inputMode: 'numeric',
-																pattern: '[0-9]*',
-															}}
-															placeholder={'Cena przewozu'}
-															onChange={setCeny('numer' + index + index1)}
-														/>
-													</td>
-												))}
+											<tr>
+												{Object.keys(dostawcyState).map((element, index1) =>
+													fikcyjnyOdbiorca && index === Object.keys(odbiorcyState).length - 1 ? (
+														<td>
+															<TextField
+																type="number"
+																variant="standard"
+																size="small"
+																inputProps={{
+																	style: {
+																		textAlign: 'center',
+																	},
+																	inputMode: 'numeric',
+																	pattern: '[0-9]*',
+																}}
+																disabled
+																placeholder="0"
+															/>
+														</td>
+													) : fikcyjnyDostawca && index1 === Object.keys(dostawcyState).length - 1 ? (
+														<td>
+															<TextField
+																type="number"
+																variant="standard"
+																size="small"
+																inputProps={{
+																	style: {
+																		textAlign: 'center',
+																	},
+																	inputMode: 'numeric',
+																	pattern: '[0-9]*',
+																}}
+																disabled
+																placeholder={'0'}
+															/>
+														</td>
+													) : (
+														<td>
+															<TextField
+																type="number"
+																variant="standard"
+																size="small"
+																inputProps={{
+																	style: {
+																		textAlign: 'center',
+																	},
+																	inputMode: 'numeric',
+																	pattern: '[0-9]*',
+																}}
+																placeholder={'Cena przewozu'}
+																onChange={setCeny('numer' + index + index1)}
+															/>
+														</td>
+													)
+												)}
 											</tr>
 										))}
 									</tbody>
 								</table>
 							</div>
-							<Button variant="contained" onClick={() => setCenyState(ceny)}>
+							<Button variant="contained" onClick={() => calculateSolution()}>
 								{'Zatwierdź koszty transportu i oblicz'}
 							</Button>
 						</FormControl>
 					</div>
 				</div>
-				<hr />
-				<h2>Dane wejściowe</h2>
 				<Table dane={basicData} />
-				<SolutionTable solutionsTable={solutionsTable} pathTable={pathTable} determinantTable={determinantTable} maxCellTable={maxCellTable} />
+				<SolutionTable solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} historyMain={historyMainValues} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);

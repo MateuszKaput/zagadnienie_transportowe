@@ -2,6 +2,11 @@
 	text-align: center;
 }
 
+.section {
+	border-radius: 10px;
+	background-color: rgb(151, 180, 182);
+	margin-bottom: 1rem;
+}
 .firstPart {
 	display: flex;
 	gap: 1rem;

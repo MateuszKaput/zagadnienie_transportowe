@@ -1,9 +1,10 @@
 .header {
 	display: flex;
 	justify-content: flex-end;
+	background-color: black;
 }
 .menu-icon {
-	margin-top: 1em;
+	color: white;
 	cursor: pointer;
 }
 .slider {

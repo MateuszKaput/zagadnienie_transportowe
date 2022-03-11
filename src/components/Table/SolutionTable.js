@@ -1,93 +1,113 @@
-import React from 'react';
+import { Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import './SolutionTable.css';
 
-function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTable }) {
+function SolutionTable({ solutionsTable, pathTable, determinantTable, history, visibleSolutions }) {
+	const [currentViewTable, setCurrent] = useState([0, 0, 0, 0]);
+
+	function addViewValue(index) {
+		let newState = [...currentViewTable];
+		newState[index] = currentViewTable[index] + 1;
+		let size = Object.keys(pathTable[index]).length;
+		if (!(newState[index] >= size)) {
+			setCurrent(newState);
+		}
+	}
+
+	function subtractViewValue(index) {
+		let newState = [...currentViewTable];
+		newState[index] = currentViewTable[index] - 1;
+		if (!(newState[index] < 0)) {
+			setCurrent(newState);
+		}
+	}
+
 	return (
 		<>
 			<div className="divFlexBox">
-				{solutionsTable.map((value, index) => (
-					<>
-						<hr />
-						<h3>Przybliżenie numer: {index + 1}</h3>
+				{solutionsTable.map((value, mainIndex) => (
+					<div className="sekcja">
+						<center>
+							<h3>{mainIndex === 0 ? 'Przybliżenie metodą kąta północno zachodniego' : 'Przybliżenie numer:' + parseInt(mainIndex + 1)}</h3>
+						</center>
 						<div className="divSingleRow">
 							<div className="oneElement">
-								<p>
-									{index === 0
-										? 'Tabela zawiera pierwsze poprawne rozwiązanie stworzone przy pomocy metody konta północno zachodniego'
-										: 'Kolejne przybliżenie stworzone przy pomocy metody potencjałów. '}
-								</p>
+								<p>{'Ścieżka algorytmu która przedstawia w jakiej kolejności komórki zmieniały wartość '}</p>
+								{mainIndex === 0 ? (
+									<ul>
+										<li>
+											<b>Pierwszy wiersz</b> - przedstawia wartości jakie pozostały u poszczególnych dostawców
+										</li>
+										<li>
+											<b>Pierwsza kolumna</b> - przedstawia wartości jakie pozostały u poszczególnych odbiorców
+										</li>
+									</ul>
+								) : (
+									true
+								)}
+
 								<div className="tableDiv">
-									<table className="first_col">
-										<thead>
-											<tr>
-												<td>Rozwiązania </td>
-											</tr>
-											{solutionsTable[index].map((value1, mango1) => (
-												<tr key={Math.random()}>
-													<td key={Math.random()}>Odbiorca {mango1 + 1}</td>
-												</tr>
-											))}
-										</thead>
-									</table>
-									<table className="rows">
-										<thead>
-											<tr>
-												{solutionsTable[index][0].map((value1, mango2) => (
-													<td key={Math.random()}>Dostawca {mango2 + 1}</td>
-												))}
-											</tr>
-										</thead>
+									<table className="solutions">
 										<tbody>
-											{solutionsTable[index].map((value1, mango3) => (
-												<tr key={Math.random()}>
-													{value1.map((banana, mango4) => (
-														<td key={Math.random()}>{banana}</td>
-													))}
-												</tr>
-											))}
+											{history[mainIndex] === undefined
+												? true
+												: history[mainIndex][currentViewTable[mainIndex]] === undefined
+												? true
+												: history[mainIndex][currentViewTable[mainIndex]].map((value, index) => {
+														return (
+															<tr>
+																{value.map((value2, index2) => {
+																	return (
+																		<td
+																			style={
+																				index2 === pathTable[mainIndex][currentViewTable[mainIndex]][1] + 1 &&
+																				index === pathTable[mainIndex][currentViewTable[mainIndex]][0] + 1
+																					? {
+																							backgroundColor: 'green',
+																					  }
+																					: {}
+																			}
+																		>
+																			{value2}
+																		</td>
+																	);
+																})}
+															</tr>
+														);
+												  })}
 										</tbody>
 									</table>
 								</div>
+								<Button variant="contained" onClick={() => subtractViewValue(mainIndex)}>
+									{'Poprzedni'}
+								</Button>
+								<Button variant="contained" onClick={() => addViewValue(mainIndex)}>
+									{'Kolejny'}
+								</Button>
 							</div>
+
 							<div className="oneElement">
-								<p>Wartość i położenie najmniejszego wskaźnika od którego rozpocznie się kolejne przybliżenie</p>
+								<p>{mainIndex === 0 ? 'Tabela zawiera pierwsze poprawne rozwiązanie stworzone przy pomocy metody kąta północno zachodniego' : 'Kolejne przybliżenie stworzone przy pomocy metody potencjałów. '}</p>
 								<div className="tableDiv">
-									<table className="first_col">
-										<thead>
-											<tr>
-												<td>Minimum</td>
-											</tr>
-											<tr>
-												<td>Wartość</td>
-											</tr>
-										</thead>
+									<table className="solutions">
 										<tbody>
-											<tr></tr>
-										</tbody>
-									</table>
-									<table className="rows">
-										<thead>
-											<tr>
-												<td>Wartość</td>
-												<td>Odbiorca</td>
-												<td>Dostawca</td>
-											</tr>
-											<tr>
-												<td>{maxCellTable[index][0]}</td>
-												<td>{maxCellTable[index][1][0]}</td>
-												<td>{maxCellTable[index][1][1]}</td>
-											</tr>
-										</thead>
-										<tbody>
-											<tr></tr>
+											{visibleSolutions[mainIndex] === undefined
+												? true
+												: visibleSolutions[mainIndex].map((value, index) => {
+														return (
+															<tr>
+																{value.map((value2, index2) => {
+																	return <td>{value2}</td>;
+																})}
+															</tr>
+														);
+												  })}
 										</tbody>
 									</table>
 								</div>
 							</div>
 						</div>
-						{
-							//-------------------------------------------------------------------}
-						}
+
 						<div className="divSingleRow">
 							<div className="oneElement">
 								<p>Wskaźniki dla pól które nie należą do aktualnej ścieżki dostaw</p>
@@ -97,9 +117,9 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											<tr>
 												<td>Wskaźniki</td>
 											</tr>
-											{determinantTable[index].map((value1, mango9) => (
+											{determinantTable[mainIndex].map((value1, index) => (
 												<tr key={Math.random()}>
-													<td key={Math.random()}>Wskaźnik {mango9 + 1}</td>
+													<td key={Math.random()}>Wskaźnik {index + 1}</td>
 												</tr>
 											))}
 										</thead>
@@ -113,7 +133,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											</tr>
 										</thead>
 										<tbody>
-											{determinantTable[index].map((value1, mango9) => (
+											{determinantTable[mainIndex].map((value1, index) => (
 												<tr key={Math.random()}>
 													<td key={Math.random()}>{value1[0]}</td>
 													<td key={Math.random()}>{value1[1][0]}</td>
@@ -132,9 +152,9 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											<tr>
 												<td>Ścieżka</td>
 											</tr>
-											{pathTable[index].map((value1, mango9) => (
+											{pathTable[mainIndex].map((value1, index) => (
 												<tr key={Math.random()}>
-													<td key={Math.random()}>Punkt {mango9 + 1}</td>
+													<td key={Math.random()}>Punkt {index + 1}</td>
 												</tr>
 											))}
 										</thead>
@@ -148,9 +168,9 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 											</tr>
 										</thead>
 										<tbody>
-											{pathTable[index].map((value1, mango11) => (
+											{pathTable[mainIndex].map((value1, index) => (
 												<tr key={Math.random()}>
-													{value1.map((banana, mango12) => (
+													{value1.map((banana, index) => (
 														<td key={Math.random()}>{banana}</td>
 													))}
 												</tr>
@@ -160,7 +180,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, maxCellTab
 								</div>
 							</div>
 						</div>
-					</>
+					</div>
 				))}
 			</div>
 		</>

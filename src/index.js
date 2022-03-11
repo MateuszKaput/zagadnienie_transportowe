@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider, createTheme } from '@mui/material';
-
 const theme = createTheme();
 
 ReactDOM.render(
