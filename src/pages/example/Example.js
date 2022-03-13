@@ -37,9 +37,13 @@ function Example() {
 	const [maxCellTable, updateMaxCellTable] = useState([]);
 	const [newPathsTable, updateNewPaths] = useState([]);
 	const [historyTable, updateHistory] = useState([]);
+	const [totalneSumy, updateTotalneSumy] = useState([]);
+
 	const keepSolvingRef = useRef(true);
 
 	function makeTables({ rows, columns }) {
+		let suma = [];
+
 		let totalTable = [];
 		let totalSolutions = [];
 		for (let y = 0; y < newPathsTable.length; y++) {
@@ -47,6 +51,7 @@ function Example() {
 			for (let u = 0; u < newPathsTable[y].length; u++) {
 				let table = [];
 				let singleSolution = [];
+				suma[y] = 0;
 
 				for (let i = 0; i < rows + 1; i++) {
 					singleSolution[i] = [];
@@ -67,6 +72,12 @@ function Example() {
 					}
 				}
 				totalSolutions[y] = singleSolution;
+
+				for (let o = 1; o < rows + 1; o++) {
+					for (let p = 1; p < columns + 1; p++) {
+						suma[y] += parseInt(singleSolution[o][p] * basicData.prices[o - 1][p - 1]);
+					}
+				}
 				for (let k = 0; k < rows + 1; k++) {
 					table[k] = [];
 				}
@@ -92,6 +103,8 @@ function Example() {
 			}
 			totalTable[y] = middleTable;
 		}
+		updateTotalneSumy(suma);
+
 		updateHistory(totalTable);
 		updateVisibleSolutions(totalSolutions);
 	}
@@ -386,7 +399,7 @@ function Example() {
 			<Navbar />
 			<div className="box">
 				<Table dane={basicData} />
-				<SolutionTable solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} visibleSolutions={visibleSolutions} />
+				<SolutionTable totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);

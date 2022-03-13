@@ -47,9 +47,11 @@ function UserExample() {
 	const [historyTable, updateHistory] = useState([]);
 	const [historyMainValues, setMainHistory] = useState([]);
 	const [newPathsTable, updateNewPaths] = useState([]);
+	const [totalneSumy, updateTotalneSumy] = useState([]);
 	const keepSolvingRef = useRef(true);
 
 	function makeTables() {
+		let suma = [];
 		let rows = Object.keys(odbiorcyState).length;
 		let columns = Object.keys(dostawcyState).length;
 		let totalHistory = [];
@@ -57,10 +59,12 @@ function UserExample() {
 		for (let y = 0; y < newPathsTable.length; y++) {
 			let middleHistory = [];
 			let singleSolution = [];
+			suma[y] = 0;
 
 			for (let i = 0; i < rows + 1; i++) {
 				singleSolution[i] = [];
 			}
+
 			for (let a = 0; a < rows + 1; a++) {
 				for (let b = 0; b < columns + 1; b++) {
 					if (a === 0) {
@@ -77,6 +81,14 @@ function UserExample() {
 				}
 			}
 			totalSolutions[y] = singleSolution;
+
+			for (let o = 1; o < rows + 1; o++) {
+				for (let p = 1; p < columns + 1; p++) {
+					suma[y] += parseInt(singleSolution[o][p] * basicData.prices[o - 1][p - 1]);
+				}
+			}
+			console.log(suma, basicData.prices, singleSolution);
+
 			for (let u = 0; u < newPathsTable[y].length; u++) {
 				let singleHistory = [];
 
@@ -85,7 +97,8 @@ function UserExample() {
 				}
 
 				for (let i = 0; i < columns + 1; i++) {
-					i === 0 ? (singleHistory[0][i] = 'Transport') : y === 0 ? (singleHistory[0][i] = historyMainValues[u][1][i - 1]) : (singleHistory[0][i] = 'Dostawca ' + i);
+					let value = historyMainValues[u][1][i - 1];
+					i === 0 ? (singleHistory[0][i] = 'Transport') : y === 0 ? (singleHistory[0][i] = value) : (singleHistory[0][i] = 'Dostawca ' + i);
 				}
 
 				for (let j = 1; j < rows + 1; j++) {
@@ -105,9 +118,11 @@ function UserExample() {
 			}
 			totalHistory[y] = middleHistory;
 		}
-		console.log('Total history: ', totalHistory);
-		console.log('Solutions table: ', totalSolutions);
-		console.log('Old Solutions table: ', solutionsTable);
+
+		//console.log('Total history: ', totalHistory);
+		//console.log('Solutions table: ', totalSolutions);
+		//console.log('Old Solutions table: ', solutionsTable);
+		updateTotalneSumy(suma);
 		updateHistory(totalHistory);
 		updateVisibleSolutions(totalSolutions);
 	}
@@ -393,19 +408,25 @@ function UserExample() {
 				sprzedawcy[column] -= sprzedawcy[column];
 				path[stepCount] = [row, column];
 				basePoints[stepCount] = [row, column];
-				if (row === rows - 1 && column === cols - 1) {
-					row++;
-					column++;
-					stepCount++;
-				} else {
-					path[stepCount + 1] = [row + 1, column];
-					basePoints[stepCount + 1] = [row + 1, column];
-					row++;
-					column++;
-					stepCount += 2;
-				}
+				row++;
+				stepCount++;
+				// if (row === rows - 1 && column === cols - 1) {
+				// 	row++;
+				// 	column++;
+				// 	stepCount++;
+				// } else {
+				// 	path[stepCount + 1] = [row + 1, column];
+				// 	basePoints[stepCount + 1] = [row + 1, column];
+				// 	row++;
+				// 	column++;
+				// 	hisMain[stepCount + 1] = [[], []];
+				// 	stepCount += 2;
+				// }
 			}
 
+			//console.log('kupcy: ', kupcy);
+			//console.log('sprzedawcy: ', sprzedawcy);
+			//console.log('count: ', stepCount, 'hismain: ', hisMain);
 			Object.values(kupcy).map((value, index) => {
 				hisMain[stepCount - 1][0][index] = value;
 			});
@@ -476,9 +497,7 @@ function UserExample() {
 		for (let i = 0; i < rows; i++) {
 			prices[i] = [];
 		}
-		console.log('cenystate: ', cenyState);
 		Object.keys(cenyState).map((value, index) => {
-			console.log('wartość: value', value);
 			let x = parseInt(value.substr(5, 1));
 			let y = parseInt(value.substr(6, 1));
 			prices[x][y] = parseInt(cenyState[value]);
@@ -512,7 +531,6 @@ function UserExample() {
 			let ileOdbiorcow = Object.keys(odbiorcyState).length;
 			let ileCen = Object.keys(cenyState).length;
 
-			console.log('Sprawdzanko: ', ileDostawcow, ileOdbiorcow, ileCen);
 			if (ileDostawcow * ileOdbiorcow === ileCen) {
 				let sumaDostawcy = 0;
 				let sumaOdbiorcy = 0;
@@ -535,7 +553,6 @@ function UserExample() {
 					convertData(odbiorcyState, dostawcyState);
 				}
 			} else {
-				console.log('Nie podano wszystkich danych', cenyState);
 			}
 		}
 	}, [cenyState]);
@@ -545,7 +562,6 @@ function UserExample() {
 	}
 
 	function nowyDostawca(value) {
-		console.log('Długość odbiorcy: ', Object.keys(odbiorcyState).length);
 		setFikcyjnyDostawca(true);
 		let dostawcyKopia = { ...dostawcyState };
 		dostawcyKopia = { ...dostawcyKopia, nowy: 0 };
@@ -556,17 +572,14 @@ function UserExample() {
 		setOferowaneState(oferowaneKopia);
 
 		let cenyKopia = { ...cenyState };
-		console.log(odbiorcyState, Object.keys(odbiorcyState).length);
 		for (let i = 0; i < Object.keys(odbiorcyState).length; i++) {
 			let string = 'numer' + i + Object.keys(dostawcyState).length;
 			cenyKopia = { ...cenyKopia, [`${string}`]: '0' };
 		}
-		console.log('Nowy Dostawca: ', cenyKopia);
 		setCenyState(cenyKopia);
 	}
 
 	function nowyOdbiorca(value) {
-		console.log('Długość dostawcy: ', Object.keys(dostawcyState).length);
 		setfikcyjnyOdbiorca(true);
 		let odbiorcykopia = { ...odbiorcyState };
 		odbiorcykopia = { ...odbiorcykopia, nowy: 0 };
@@ -581,7 +594,6 @@ function UserExample() {
 			let string = 'numer' + Object.keys(odbiorcyState).length + i;
 			cenyKopia = { ...cenyKopia, [`${string}`]: '0' };
 		}
-		console.log('Nowy Odbiorca: ', cenyKopia);
 		setCenyState(cenyKopia);
 	}
 	return (
@@ -841,7 +853,7 @@ function UserExample() {
 					</div>
 				</div>
 				<Table dane={basicData} />
-				<SolutionTable solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} historyMain={historyMainValues} visibleSolutions={visibleSolutions} />
+				<SolutionTable totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} historyMain={historyMainValues} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);

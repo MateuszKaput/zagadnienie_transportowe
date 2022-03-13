@@ -2,8 +2,8 @@ import { Button } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './SolutionTable.css';
 
-function SolutionTable({ solutionsTable, pathTable, determinantTable, history, visibleSolutions }) {
-	const [currentViewTable, setCurrent] = useState([0, 0, 0, 0]);
+function SolutionTable({ solutionsTable, pathTable, determinantTable, history, visibleSolutions, totalneSumy }) {
+	const [currentViewTable, setCurrent] = useState([]);
 
 	function addViewValue(index) {
 		let newState = [...currentViewTable];
@@ -13,6 +13,14 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, history, v
 			setCurrent(newState);
 		}
 	}
+
+	useEffect(() => {
+		let tempCurrent = [];
+		for (let i = 0; i < Object.keys(history).length; i++) {
+			tempCurrent[i] = 0;
+		}
+		setCurrent(tempCurrent);
+	}, [history]);
 
 	function subtractViewValue(index) {
 		let newState = [...currentViewTable];
@@ -52,7 +60,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, history, v
 											{history[mainIndex] === undefined
 												? true
 												: history[mainIndex][currentViewTable[mainIndex]] === undefined
-												? true
+												? console.log('Main Index: ', history[mainIndex])
 												: history[mainIndex][currentViewTable[mainIndex]].map((value, index) => {
 														return (
 															<tr>
@@ -78,10 +86,10 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, history, v
 										</tbody>
 									</table>
 								</div>
-								<Button variant="contained" onClick={() => subtractViewValue(mainIndex)}>
+								<Button className="guzikiSterowanie" variant="contained" onClick={() => subtractViewValue(mainIndex)}>
 									{'Poprzedni'}
 								</Button>
-								<Button variant="contained" onClick={() => addViewValue(mainIndex)}>
+								<Button className="guzikiSterowanie" variant="contained" onClick={() => addViewValue(mainIndex)}>
 									{'Kolejny'}
 								</Button>
 							</div>
@@ -176,6 +184,18 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, history, v
 												</tr>
 											))}
 										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div className="divSingleRow">
+							<div className="oneElement">
+								<p>Aktualny całkowity koszt transportu:</p>
+								<div className="tableDiv">
+									<table>
+										<tr>
+											<td>{totalneSumy[mainIndex]}</td>
+										</tr>
 									</table>
 								</div>
 							</div>

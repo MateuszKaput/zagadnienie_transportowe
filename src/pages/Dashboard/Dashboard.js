@@ -29,10 +29,7 @@ const Dashboard = () => {
 				<h5 style={{ padding: '10px' }}>
 					<b>Zagadnienie transportowe</b> polega na ustaleniu takich ilości przewozu towarów od dostawców do odbiorców, aby zostało zaspokojone zapotrzebowanie wszystkich odbiorców oraz - aby sumaryczny koszt transportu był minimalny.
 				</h5>
-				<p>
-					Ilości przewożonych towarów od dostawców do odbiorców tworzą tak zwany plan przewozu. Aby rozwiązać zagadnienie transportowe (ZT) trzeba znaleźć taki plan przewozu, dla którego sumaryczny koszt transportu jest minimalny. Wszystkie dane wejściowe
-					możemy prezentować w postaci tablicy transportowej:
-				</p>
+				<p>Ilości przewożonych towarów od dostawców do odbiorców tworzą tak zwany plan przewozu. Aby rozwiązać zagadnienie transportowe (ZT) trzeba znaleźć taki plan przewozu, dla którego sumaryczny koszt transportu jest minimalny. Wszystkie dane wejściowe możemy prezentować w postaci tablicy transportowej:</p>
 				<div className="singlepart">
 					<div>
 						<img src={tablicaTransportowa} alt="tablicaTransportowa"></img>
@@ -89,8 +86,7 @@ const Dashboard = () => {
 						<div className="legenda">
 							Wytłumaczenie:
 							<br />
-							<br /> Rozpoczynamy od lewego górnego narożnika i uzupełniamy minimalną wartością od dostawcy lub odbiorcy. Jeśli wartość minimalna była u dostawcy (w wierszu) to przesuwamy się w prawo, natomiast jeśli u
-							odbiorcy (w kolumnie) to przesuwamy się w dół. <br />
+							<br /> Rozpoczynamy od lewego górnego narożnika i uzupełniamy minimalną wartością od dostawcy lub odbiorcy. Jeśli wartość minimalna była u dostawcy (w wierszu) to przesuwamy się w prawo, natomiast jeśli u odbiorcy (w kolumnie) to przesuwamy się w dół. <br />
 							<br />
 							Po zmianie komórki powtórzamy czynność lecz tym razem wartość u dostawcy lub odbiorcy będzie pomniejszona o tę wartość którą wpisaliśmy wcześniej w tym samym wierszu/kolumnie.
 						</div>
@@ -118,10 +114,7 @@ const Dashboard = () => {
 								<li>
 									Na bazie komórek bazowych (pogrubionych) i wzoru "u<sub>1</sub> + v<sub>1</sub> = c<sub>11</sub>" nadajemy potencjały wierszom i kolumnom.
 								</li>
-								<li>
-									Zasada jest prosta. Bierzemy komórkę BAZOWĄ dla wiersza lub kolumny dla której nadaliśmy właśnie potencjał i z naszego wzoru (cena w komórce = potencjał wiersza +
-									potencjał kolumny) obliczamy resztę potencjałów
-								</li>
+								<li>Zasada jest prosta. Bierzemy komórkę BAZOWĄ dla wiersza lub kolumny dla której nadaliśmy właśnie potencjał i z naszego wzoru (cena w komórce = potencjał wiersza + potencjał kolumny) obliczamy resztę potencjałów</li>
 							</ul>
 						</div>
 					</div>
@@ -158,7 +151,7 @@ const Dashboard = () => {
 						</div>
 					</b>
 					<b>
-						<li>Teraz następuje ostatnia faza jaką jest przesunięcie transortowanych wartości wedle schematu:</li>
+						<li>Teraz następuje ostatnia faza jaką jest przesunięcie transportowanych wartości wedle schematu:</li>
 						<div className="singlepart">
 							<div className="obrazki">
 								<img src={przesuniecie} alt="nowaTrasa"></img>
