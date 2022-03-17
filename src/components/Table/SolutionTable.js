@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './SolutionTable.css';
 
-function SolutionTable({ solutionsTable, pathTable, determinantTable, history, visibleSolutions, totalneSumy }) {
+function SolutionTable({ checking, solutionsTable, pathTable, determinantTable, history, visibleSolutions, totalneSumy }) {
 	const [currentViewTable, setCurrent] = useState([]);
 
 	function addViewValue(index) {
@@ -41,7 +41,7 @@ function SolutionTable({ solutionsTable, pathTable, determinantTable, history, v
 						<div className="divSingleRow">
 							<div className="oneElement">
 								<p>{'Ścieżka algorytmu która przedstawia w jakiej kolejności komórki zmieniały wartość '}</p>
-								{mainIndex === 0 ? (
+								{mainIndex === 0 && checking === true ? (
 									<ul>
 										<li>
 											<b>Pierwszy wiersz</b> - przedstawia wartości jakie pozostały u poszczególnych dostawców

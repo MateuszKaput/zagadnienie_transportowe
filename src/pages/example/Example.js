@@ -399,7 +399,7 @@ function Example() {
 			<Navbar />
 			<div className="box">
 				<Table dane={basicData} />
-				<SolutionTable totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} visibleSolutions={visibleSolutions} />
+				<SolutionTable checking={false} totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);

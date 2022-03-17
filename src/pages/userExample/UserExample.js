@@ -87,7 +87,6 @@ function UserExample() {
 					suma[y] += parseInt(singleSolution[o][p] * basicData.prices[o - 1][p - 1]);
 				}
 			}
-			console.log(suma, basicData.prices, singleSolution);
 
 			for (let u = 0; u < newPathsTable[y].length; u++) {
 				let singleHistory = [];
@@ -410,23 +409,7 @@ function UserExample() {
 				basePoints[stepCount] = [row, column];
 				row++;
 				stepCount++;
-				// if (row === rows - 1 && column === cols - 1) {
-				// 	row++;
-				// 	column++;
-				// 	stepCount++;
-				// } else {
-				// 	path[stepCount + 1] = [row + 1, column];
-				// 	basePoints[stepCount + 1] = [row + 1, column];
-				// 	row++;
-				// 	column++;
-				// 	hisMain[stepCount + 1] = [[], []];
-				// 	stepCount += 2;
-				// }
 			}
-
-			//console.log('kupcy: ', kupcy);
-			//console.log('sprzedawcy: ', sprzedawcy);
-			//console.log('count: ', stepCount, 'hismain: ', hisMain);
 			Object.values(kupcy).map((value, index) => {
 				hisMain[stepCount - 1][0][index] = value;
 			});
@@ -853,7 +836,7 @@ function UserExample() {
 					</div>
 				</div>
 				<Table dane={basicData} />
-				<SolutionTable totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} historyMain={historyMainValues} visibleSolutions={visibleSolutions} />
+				<SolutionTable checking={true} totalneSumy={totalneSumy} solutionsTable={solutionsTable} pathTable={newPathsTable} determinantTable={determinantTable} history={historyTable} historyMain={historyMainValues} visibleSolutions={visibleSolutions} />
 			</div>
 		</div>
 	);
